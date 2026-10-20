@@ -1,6 +1,6 @@
 {
-  "name": "NusaKini - Portal Berita Digital Terkini & Tepercaya",
-  "description": "Portal berita digital menyajikan informasi terkini secara cepat, akurat, dan tepercaya setiap hari dengan gaya editorial modern khas Detik dan CNN Indonesia.",
+  "name": "ARUN NEWS - Jembatan Media Nusantara",
+  "description": "Portal berita digital Arun News: Jembatan Media Nusantara menyajikan informasi terkini secara cepat, akurat, dan tepercaya setiap hari.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

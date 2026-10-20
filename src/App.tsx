@@ -10,6 +10,9 @@ import Header from './components/Header';
 import BreakingNewsTicker from './components/BreakingNewsTicker';
 import TrendingBar from './components/TrendingBar';
 import HeroHeadlines from './components/HeroHeadlines';
+import PublicServicesWidget from './components/PublicServicesWidget';
+import EditorialPicksSection from './components/EditorialPicksSection';
+import VideoNewsSection from './components/VideoNewsSection';
 import NewsStreamSection from './components/NewsStreamSection';
 import MultimediaGallery from './components/MultimediaGallery';
 import ArticleModal from './components/ArticleModal';
@@ -17,6 +20,7 @@ import SavedArticlesDrawer from './components/SavedArticlesDrawer';
 import SearchModal from './components/SearchModal';
 import SawerKopiModal from './components/SawerKopiModal';
 import LaporWargaModal from './components/LaporWargaModal';
+import EditorialInfoModal, { EditorialModalTab } from './components/EditorialInfoModal';
 import AdminPanel from './components/AdminPanel';
 import AdSlotBanner from './components/AdSlotBanner';
 import Footer from './components/Footer';
@@ -99,6 +103,7 @@ export default function App() {
   const [isSawerKopiOpen, setIsSawerKopiOpen] = useState(false);
   const [sawerKopiContextTitle, setSawerKopiContextTitle] = useState<string | undefined>(undefined);
   const [isLaporWargaOpen, setIsLaporWargaOpen] = useState(false);
+  const [editorialModalTab, setEditorialModalTab] = useState<EditorialModalTab | null>(null);
 
   // View Mode: 'portal' or 'admin'
   const [viewMode, setViewMode] = useState<'portal' | 'admin'>(() => {
@@ -492,18 +497,39 @@ export default function App() {
 
       {/* Main News Layout */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full text-white">
-        {/* Hero Section on Front Page */}
+        {/* Front Page Featured Sections */}
         {activeCategory === 'Semua' && !selectedTag && (
-          <HeroHeadlines
-            leadArticle={leadArticle}
-            secondaryArticles={secondaryArticles}
-            onSelectArticle={(art) => setSelectedArticle(art)}
-            onToggleBookmark={handleToggleBookmark}
-            isBookmarked={isBookmarked}
-            onShare={handleShare}
-            onOpenSawerKopi={handleOpenSawerKopi}
-            darkMode={darkMode}
-          />
+          <>
+            <HeroHeadlines
+              leadArticle={leadArticle}
+              secondaryArticles={secondaryArticles}
+              onSelectArticle={(art) => setSelectedArticle(art)}
+              onToggleBookmark={handleToggleBookmark}
+              isBookmarked={isBookmarked}
+              onShare={handleShare}
+              onOpenSawerKopi={handleOpenSawerKopi}
+              darkMode={darkMode}
+            />
+
+            {/* Prakiraan Cuaca & Jadwal Transportasi Nusantara */}
+            <PublicServicesWidget darkMode={darkMode} />
+
+            {/* Berita Pilihan Redaksi */}
+            <EditorialPicksSection
+              articles={articles}
+              onSelectArticle={(art) => setSelectedArticle(art)}
+              onToggleBookmark={handleToggleBookmark}
+              isBookmarked={isBookmarked}
+              darkMode={darkMode}
+            />
+
+            {/* Warta Video & Liputan Khusus */}
+            <VideoNewsSection
+              articles={articles}
+              onSelectArticle={(art) => setSelectedArticle(art)}
+              darkMode={darkMode}
+            />
+          </>
         )}
 
         {/* Dedicated Category Spotlight Header (Active when clicking any category) */}
@@ -540,6 +566,7 @@ export default function App() {
                   {activeCategory === 'Kriminal' && 'Laporan penegakan hukum, pemberantasan kejahatan, dan investigasi kasus hukum dengan akurasi dan etika jurnalistik teruji.'}
                   {activeCategory === 'Olahraga' && 'Ulasan pertandingan, prestasi atlet kebanggaan Garuda, dan dinamika kompetisi olahraga nasional hingga internasional.'}
                   {activeCategory === 'Legalitas' && 'Profil dan keabsahan hukum resmi PT Arun Media Nusantara: SK Kemenkumham RI, NIB KBLI 63122, NPWP Perusahaan Pers, serta Sertifikasi Verifikasi Faktual Dewan Pers.'}
+                  {activeCategory === 'Ekonomi' && 'Analisis komprehensif pasar modal, pergerakan IHSG, industri perbankan nasional, pembiayaan digital UMKM, investasi manufaktur hijau, dan denyut nadi perekonomian Nusantara.'}
                   {activeCategory === 'Lapor Warga' && 'Ruang suara dan advokasi jurnalisme warga. Laporkan kerusakan fasilitas publik, keluhan layanan, atau peristiwa di sekitar Anda.'}
                   {activeCategory === 'Lain-lain' && 'Ragam informasi gaya hidup, teknologi, fenomena terkini, dan serba-serbi Nusantara terhangat.'}
                 </p>
@@ -626,6 +653,12 @@ export default function App() {
           setSelectedTag(null);
         }}
         onOpenSawerKopi={() => handleOpenSawerKopi('Dukungan Redaksi')}
+        onOpenLaporWarga={() => setIsLaporWargaOpen(true)}
+        onOpenAdmin={() => {
+          window.location.hash = 'admin';
+          setViewMode('admin');
+        }}
+        onOpenEditorialInfo={(tab) => setEditorialModalTab(tab)}
         darkMode={darkMode}
         customLogoUrl={customLogoUrl}
       />
@@ -693,6 +726,19 @@ export default function App() {
         onSubmitReport={handleAddCitizenReport}
         darkMode={darkMode}
         laporConfig={laporConfig}
+      />
+
+      {/* Official Journalistic & Editorial Info Modal */}
+      <EditorialInfoModal
+        isOpen={editorialModalTab !== null}
+        initialTab={editorialModalTab || 'box_redaksi'}
+        onClose={() => setEditorialModalTab(null)}
+        onOpenLaporWarga={() => setIsLaporWargaOpen(true)}
+        onOpenAdmin={() => {
+          window.location.hash = 'admin';
+          setViewMode('admin');
+        }}
+        darkMode={darkMode}
       />
     </div>
   );

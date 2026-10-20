@@ -22,7 +22,7 @@ export const CATEGORIES: (string | NewsCategory)[] = [
   'Lain-lain',
   'Olahraga',
   'Legalitas',
-  'Lapor Warga'
+  'Ekonomi'
 ];
 
 export default function Header({
@@ -97,14 +97,7 @@ export default function Header({
                       : 'text-blue-100 hover:text-white hover:bg-blue-800/60'
                   }`}
                 >
-                  {cat === 'Lapor Warga' ? (
-                    <span className="flex items-center gap-1">
-                      <Megaphone className="w-3 h-3 text-amber-400" />
-                      <span>Lapor Warga</span>
-                    </span>
-                  ) : (
-                    cat
-                  )}
+                  {cat}
                 </button>
               );
             })}

@@ -5,6 +5,7 @@ export type NewsCategory =
   | 'Lain-lain' 
   | 'Olahraga' 
   | 'Legalitas' 
+  | 'Ekonomi'
   | 'Lapor Warga';
 
 export interface CommentItem {
@@ -496,6 +497,112 @@ export const INITIAL_ARTICLES: Article[] = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     tags: ['Video Berita', 'Legalitas', 'Dewan Pers', 'PT Arun Media Nusantara', 'Liputan Khusus'],
     comments: []
+  },
+  {
+    id: 'art-ekonomi-1',
+    title: 'IHSG Tembus Rekor Baru 8.120: Investasi Manufaktur Hijau Rp 45 Triliun Mengalir Deras ke Koridor Industri Nusantara',
+    slug: 'ihsg-rekor-baru-investasi-manufaktur-hijau-nusantara',
+    category: 'Ekonomi',
+    summary: 'Pasar modal Indonesia mencatat rekor tertinggi sepanjang sejarah didorong surplus neraca perdagangan dan masuknya investor global di sektor ekosistem baterai dan energi terbarukan.',
+    content: [
+      'Indeks Harga Saham Gabungan (IHSG) Bursa Efek Indonesia kembali mencetak rekor penutupan tertinggi (all-time high) di level 8.120,45 dengan nilai transaksi harian melampaui Rp 19,8 triliun.',
+      'Lonjakan ini ditopang oleh aksi beli bersih investor asing (net foreign buy) yang mengalir deras ke saham-saham sektor perbankan buku IV, infrastruktur energi hijau, dan manufaktur teknologi.',
+      'Menteri Koordinator Bidang Perekonomian menyatakan bahwa realisasi investasi triwulan ini mencatatkan rekor Rp 45 triliun untuk proyek hilirisasi nikel, pabrik anoda baterai kendaraan listrik, dan pembangkit listrik tenaga surya terapung di Jawa Barat dan Maluku Utara.',
+      'Bank Dunia dan IMF memproyeksikan pertumbuhan ekonomi Indonesia tetap tangguh di kisaran 5,2 persen di tengah ketidakpastian geopolitik global berkat kuatnya konsumsi domestik dan inflasi yang terkendali di 2,4 persen.'
+    ],
+    keyPoints: [
+      'IHSG menembus rekor 8.120 dengan total transaksi harian Rp 19,8 triliun.',
+      'Net buy investor asing menyentuh Rp 3,2 triliun dalam sepekan terakhir.',
+      'Investasi hijau Rp 45 triliun mengalir ke hilirisasi baterai dan energi baru terbarukan.'
+    ],
+    author: {
+      name: 'Rendra Mahendra, S.E.',
+      role: 'Redaktur Ekonomi & Pasar Modal',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80'
+    },
+    publishedAt: '19 Okt 2026, 16:00 WIB',
+    readTime: '4 mnt baca',
+    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+    imageCaption: 'Layar pergerakan grafik bursa saham di gedung Bursa Efek Indonesia, SCBD Jakarta.',
+    viewsCount: 42100,
+    sharesCount: 2890,
+    isEditorPick: true,
+    tags: ['Ekonomi', 'IHSG', 'Bursa Efek Indonesia', 'Investasi Hijau', 'Pasar Modal'],
+    comments: [
+      {
+        id: 'c-eko-1',
+        author: 'Hendro Gunawan',
+        avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80',
+        timeAgo: '15 menit lalu',
+        content: 'Fundamental emiten perbankan dan energi kita memang solid. Harapan besar ekonomi riil dan UMKM juga kian terangkat.',
+        likes: 31
+      }
+    ]
+  },
+  {
+    id: 'art-ekonomi-2',
+    title: 'Penyaluran KUR Digital UMKM Tembus Rp 280 Triliun, Bank Indonesia Pertahankan BI-Rate 6% Jaga Stabilitas Rupiah',
+    slug: 'penyaluran-kur-digital-umkm-tembus-280-triliun-bi-rate',
+    category: 'Ekonomi',
+    summary: 'Akses pembiayaan mikro berbasis QRIS dan skor kredit digital melesat pesat menjangkau 4,8 juta pelaku usaha mikro dari pelosok desa hingga perkotaan.',
+    content: [
+      'Rapat Dewan Gubernur Bank Indonesia (RDG BI) memutuskan untuk mempertahankan BI-Rate pada level 6,00 persen demi memperkuat stabilitas nilai tukar Rupiah terhadap Dolar AS.',
+      'Di sisi lain, akselerasi kredit produktif mencatat lonjakan signifikan. Penyaluran Kredit Usaha Rakyat (KUR) berplatform digital terintegrasi telah mencapai Rp 280 triliun hingga kuartal ketiga.',
+      'Skema penilaian kredit alternatif (alternative credit scoring) berbasis histori transaksi dompet digital dan e-commerce berhasil membuka akses pembiayaan berbunga rendah 6% bagi 4,8 juta wirausaha perempuan dan petani milenial.',
+      'Gubernur Bank Indonesia menegaskan digitalisasi sistem pembayaran seperti perluasan QRIS Antarnegara kini telah efektif di lima negara ASEAN dan mempermudah devisa pedagang lokal.'
+    ],
+    keyPoints: [
+      'BI-Rate dipertahankan di 6,00% untuk menjaga inflasi dan daya tahan nilai tukar Rupiah.',
+      'Realisasi KUR Digital tembus Rp 280 triliun dengan NPL terjaga di bawah 1,5%.',
+      'Ekspansi QRIS Antarnegara memudahkan UMKM menerima pembayaran wisatawan mancanegara.'
+    ],
+    author: {
+      name: 'Dewi Lestari, M.Si.',
+      role: 'Wartawan Makroekonomi & Perbankan',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80'
+    },
+    publishedAt: '19 Okt 2026, 12:15 WIB',
+    readTime: '3 mnt baca',
+    imageUrl: 'https://images.unsplash.com/photo-1556742049-0a67c5574f73?w=800&auto=format&fit=crop&q=80',
+    imageCaption: 'Pedagang pasar tradisional melayani transaksi pembeli menggunakan kode QRIS perbankan nasional.',
+    viewsCount: 35800,
+    sharesCount: 2100,
+    isHeadline: false,
+    tags: ['Ekonomi', 'UMKM', 'Bank Indonesia', 'KUR Digital', 'QRIS'],
+    comments: []
+  },
+  {
+    id: 'art-video-2',
+    title: 'Warta Video: Mengintip Uji Dinamis Kereta Cepat Whoosh Tahap Lanjutan Menembus Jalur Trans-Jawa',
+    slug: 'warta-video-uji-dinamis-kereta-cepat-whoosh-trans-jawa',
+    category: 'Daerah',
+    summary: 'Liputan eksklusif Arun News menaiki kabin masinis pengujian rangkaian KCIC generasi baru melaju 350 km/jam menghubungkan sentra pertumbuhan ekonomi antarkota.',
+    content: [
+      'Tim multimedia Arun News berkesempatan mengikuti uji coba dinamis komprehensif (dynamic testing) rangkaian kereta cepat generasi teranyar.',
+      'Dengan kecepatan operasi mencapai 350 km per jam, kereta bergerak mulus melintasi terowongan panjang dan jembatan beton raksasa yang membentang di atas hamparan perbukitan hijau.',
+      'Sistem kendali persinyalan otomatis CTCS-3 dan sensor seismik canggih memastikan keamanan maksimal bahkan saat menghadapi getaran gempa bumi bumi tektonik.',
+      'Integrasi stasiun kereta cepat dengan moda lanjutan seperti LRT, bus antarkota, dan taksi ramah lingkungan menciptakan simpul konektivitas modern kebanggaan Nusantara.'
+    ],
+    keyPoints: [
+      'Kecepatan tempuh stabil 350 km/jam dengan vibrasi sangat rendah.',
+      'Dilengkapi teknologi mitigasi gempa dan pengereman otomatis berpresisi milidetik.',
+      'Konektivitas antarmoda di stasiun transit mendukung mobilitas warga dan pariwisata.'
+    ],
+    author: {
+      name: 'Tim Liputan Video Arun News',
+      role: 'Divisi Multimedia & Penyiaran',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'
+    },
+    publishedAt: '19 Okt 2026, 17:30 WIB',
+    readTime: 'Video 4:10 mnt',
+    imageUrl: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&auto=format&fit=crop&q=80',
+    imageCaption: 'Rangkaian kereta cepat berdesain aerodinamis melaju kencang di jalur layang perbukitan.',
+    viewsCount: 62700,
+    sharesCount: 4890,
+    isVideo: true,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    tags: ['Warta Video', 'Kereta Cepat', 'Whoosh', 'Transportasi Modern', 'Infrastruktur'],
+    comments: []
   }
 ];
 
@@ -643,5 +750,309 @@ export const TRENDING_TAGS = [
   '#JembatanBahariMaluku',
   '#LegalitasHakCiptaAI',
   '#LaporWargaLongsor',
-  '#SandeqMandar2026'
+  '#SandeqMandar2026',
+  '#IHSGRekor8120'
 ];
+
+export interface DetailedWeatherItem {
+  id: string;
+  city: string;
+  region: string;
+  temp: number;
+  condition: string;
+  humidity: number;
+  windSpeed: number;
+  aqi: number;
+  aqiLevel: 'Baik' | 'Sedang' | 'Tidak Sehat';
+  icon: 'sun' | 'cloud' | 'rain' | 'cloud-sun' | 'cloud-lightning';
+  forecastDays: {
+    day: string;
+    tempMin: number;
+    tempMax: number;
+    condition: string;
+    icon: 'sun' | 'cloud' | 'rain' | 'cloud-sun';
+  }[];
+}
+
+export const DETAILED_WEATHER_DATA: DetailedWeatherItem[] = [
+  {
+    id: 'w-jkt',
+    city: 'DKI Jakarta',
+    region: 'Jabodetabek',
+    temp: 31,
+    condition: 'Cerah Berawan',
+    humidity: 72,
+    windSpeed: 14,
+    aqi: 74,
+    aqiLevel: 'Sedang',
+    icon: 'cloud-sun',
+    forecastDays: [
+      { day: 'Besok', tempMin: 25, tempMax: 32, condition: 'Hujan Ringan', icon: 'rain' },
+      { day: 'Lusa', tempMin: 24, tempMax: 33, condition: 'Cerah Berawan', icon: 'cloud-sun' },
+      { day: 'Rabu', tempMin: 25, tempMax: 31, condition: 'Berawan', icon: 'cloud' }
+    ]
+  },
+  {
+    id: 'w-sby',
+    city: 'Surabaya',
+    region: 'Jawa Timur',
+    temp: 34,
+    condition: 'Cerah Terik',
+    humidity: 60,
+    windSpeed: 18,
+    aqi: 58,
+    aqiLevel: 'Sedang',
+    icon: 'sun',
+    forecastDays: [
+      { day: 'Besok', tempMin: 26, tempMax: 34, condition: 'Cerah', icon: 'sun' },
+      { day: 'Lusa', tempMin: 26, tempMax: 35, condition: 'Cerah', icon: 'sun' },
+      { day: 'Rabu', tempMin: 25, tempMax: 33, condition: 'Cerah Berawan', icon: 'cloud-sun' }
+    ]
+  },
+  {
+    id: 'w-bdg',
+    city: 'Bandung',
+    region: 'Jawa Barat',
+    temp: 24,
+    condition: 'Hujan Ringan Sore',
+    humidity: 84,
+    windSpeed: 11,
+    aqi: 38,
+    aqiLevel: 'Baik',
+    icon: 'rain',
+    forecastDays: [
+      { day: 'Besok', tempMin: 20, tempMax: 26, condition: 'Hujan Sedang', icon: 'rain' },
+      { day: 'Lusa', tempMin: 19, tempMax: 25, condition: 'Berawan', icon: 'cloud' },
+      { day: 'Rabu', tempMin: 20, tempMax: 27, condition: 'Cerah Berawan', icon: 'cloud-sun' }
+    ]
+  },
+  {
+    id: 'w-ikn',
+    city: 'IKN Nusantara',
+    region: 'Kalimantan Timur',
+    temp: 28,
+    condition: 'Berawan Sejuk',
+    humidity: 78,
+    windSpeed: 12,
+    aqi: 22,
+    aqiLevel: 'Baik',
+    icon: 'cloud-sun',
+    forecastDays: [
+      { day: 'Besok', tempMin: 23, tempMax: 29, condition: 'Hujan Lokal', icon: 'rain' },
+      { day: 'Lusa', tempMin: 22, tempMax: 30, condition: 'Cerah Berawan', icon: 'cloud-sun' },
+      { day: 'Rabu', tempMin: 23, tempMax: 29, condition: 'Berawan', icon: 'cloud' }
+    ]
+  },
+  {
+    id: 'w-mdn',
+    city: 'Medan',
+    region: 'Sumatera Utara',
+    temp: 30,
+    condition: 'Berawan Lembap',
+    humidity: 80,
+    windSpeed: 13,
+    aqi: 62,
+    aqiLevel: 'Sedang',
+    icon: 'cloud',
+    forecastDays: [
+      { day: 'Besok', tempMin: 24, tempMax: 31, condition: 'Hujan Petir', icon: 'rain' },
+      { day: 'Lusa', tempMin: 23, tempMax: 30, condition: 'Berawan', icon: 'cloud' },
+      { day: 'Rabu', tempMin: 24, tempMax: 31, condition: 'Cerah Berawan', icon: 'cloud-sun' }
+    ]
+  },
+  {
+    id: 'w-mks',
+    city: 'Makassar',
+    region: 'Sulawesi Selatan',
+    temp: 32,
+    condition: 'Cerah',
+    humidity: 68,
+    windSpeed: 16,
+    aqi: 45,
+    aqiLevel: 'Baik',
+    icon: 'sun',
+    forecastDays: [
+      { day: 'Besok', tempMin: 24, tempMax: 33, condition: 'Cerah Berawan', icon: 'cloud-sun' },
+      { day: 'Lusa', tempMin: 25, tempMax: 33, condition: 'Cerah', icon: 'sun' },
+      { day: 'Rabu', tempMin: 24, tempMax: 32, condition: 'Cerah Berawan', icon: 'cloud-sun' }
+    ]
+  },
+  {
+    id: 'w-dps',
+    city: 'Denpasar',
+    region: 'Bali',
+    temp: 31,
+    condition: 'Cerah Berangin',
+    humidity: 65,
+    windSpeed: 21,
+    aqi: 32,
+    aqiLevel: 'Baik',
+    icon: 'cloud-sun',
+    forecastDays: [
+      { day: 'Besok', tempMin: 24, tempMax: 31, condition: 'Cerah', icon: 'sun' },
+      { day: 'Lusa', tempMin: 25, tempMax: 32, condition: 'Cerah Berawan', icon: 'cloud-sun' },
+      { day: 'Rabu', tempMin: 24, tempMax: 31, condition: 'Cerah', icon: 'sun' }
+    ]
+  },
+  {
+    id: 'w-aceh',
+    city: 'Banda Aceh',
+    region: 'Aceh',
+    temp: 29,
+    condition: 'Cerah Berawan',
+    humidity: 76,
+    windSpeed: 15,
+    aqi: 28,
+    aqiLevel: 'Baik',
+    icon: 'cloud-sun',
+    forecastDays: [
+      { day: 'Besok', tempMin: 23, tempMax: 30, condition: 'Berawan', icon: 'cloud' },
+      { day: 'Lusa', tempMin: 23, tempMax: 30, condition: 'Hujan Ringan', icon: 'rain' },
+      { day: 'Rabu', tempMin: 24, tempMax: 31, condition: 'Cerah Berawan', icon: 'cloud-sun' }
+    ]
+  }
+];
+
+export type TransportMode = 'kereta' | 'pesawat' | 'kapal' | 'bus';
+
+export interface TransportScheduleItem {
+  id: string;
+  mode: TransportMode;
+  operator: string;
+  code: string;
+  routeFrom: string;
+  routeTo: string;
+  depTime: string;
+  arrTime: string;
+  terminalGate: string;
+  status: 'Tepat Waktu' | 'Boarding' | 'Tunda' | 'Tiba';
+  price?: string;
+}
+
+export const TRANSPORT_SCHEDULE_DATA: TransportScheduleItem[] = [
+  // Kereta
+  {
+    id: 'tr-1',
+    mode: 'kereta',
+    operator: 'Whoosh KCIC',
+    code: 'G1218',
+    routeFrom: 'Halim Jakarta',
+    routeTo: 'Tegalluar Bandung',
+    depTime: '16:45 WIB',
+    arrTime: '17:30 WIB',
+    terminalGate: 'Peron 2',
+    status: 'Boarding'
+  },
+  {
+    id: 'tr-2',
+    mode: 'kereta',
+    operator: 'KAI Eksekutif',
+    code: 'KA-1 Argo Bromo Anggrek',
+    routeFrom: 'Stasiun Gambir',
+    routeTo: 'Surabaya Pasarturi',
+    depTime: '17:10 WIB',
+    arrTime: '01:25 WIB',
+    terminalGate: 'Jalur 3',
+    status: 'Tepat Waktu'
+  },
+  {
+    id: 'tr-3',
+    mode: 'kereta',
+    operator: 'KAI Argo Parahyangan',
+    code: 'KA-38',
+    routeFrom: 'Stasiun Gambir',
+    routeTo: 'Stasiun Bandung',
+    depTime: '18:30 WIB',
+    arrTime: '21:15 WIB',
+    terminalGate: 'Jalur 4',
+    status: 'Tepat Waktu'
+  },
+  // Pesawat
+  {
+    id: 'tr-4',
+    mode: 'pesawat',
+    operator: 'Garuda Indonesia',
+    code: 'GA-402',
+    routeFrom: 'Jakarta (CGK T3)',
+    routeTo: 'Denpasar (DPS)',
+    depTime: '16:50 WIB',
+    arrTime: '19:40 WITA',
+    terminalGate: 'Gate 14',
+    status: 'Boarding'
+  },
+  {
+    id: 'tr-5',
+    mode: 'pesawat',
+    operator: 'Citilink',
+    code: 'QG-110',
+    routeFrom: 'Jakarta (HLP)',
+    routeTo: 'Surabaya (SUB)',
+    depTime: '17:25 WIB',
+    arrTime: '18:55 WIB',
+    terminalGate: 'Gate 2',
+    status: 'Tepat Waktu'
+  },
+  {
+    id: 'tr-6',
+    mode: 'pesawat',
+    operator: 'Batik Air',
+    code: 'ID-6250',
+    routeFrom: 'Jakarta (CGK T2)',
+    routeTo: 'Balikpapan (BPN/IKN)',
+    depTime: '18:00 WIB',
+    arrTime: '21:10 WITA',
+    terminalGate: 'Gate 22',
+    status: 'Tunda'
+  },
+  // Kapal
+  {
+    id: 'tr-7',
+    mode: 'kapal',
+    operator: 'ASDP Ferry Indonesia',
+    code: 'KMP Portlink III',
+    routeFrom: 'Pelabuhan Merak',
+    routeTo: 'Pelabuhan Bakauheni',
+    depTime: '17:00 WIB',
+    arrTime: '18:45 WIB',
+    terminalGate: 'Dermaga Eksekutif',
+    status: 'Boarding'
+  },
+  {
+    id: 'tr-8',
+    mode: 'kapal',
+    operator: 'PT PELNI (Persero)',
+    code: 'KM Kelud',
+    routeFrom: 'Tj. Priok Jakarta',
+    routeTo: 'Batu Ampar Batam',
+    depTime: '20:00 WIB',
+    arrTime: '11:00 WIB (+1)',
+    terminalGate: 'Dermaga Nusantara',
+    status: 'Tepat Waktu'
+  },
+  // Bus
+  {
+    id: 'tr-9',
+    mode: 'bus',
+    operator: 'PO Sinar Jaya Suites',
+    code: 'SJ-Sleeper 88',
+    routeFrom: 'Pulo Gebang Jakarta',
+    routeTo: 'Yogyakarta - Solo',
+    depTime: '18:00 WIB',
+    arrTime: '02:30 WIB',
+    terminalGate: 'Jalur Keberangkatan B2',
+    status: 'Tepat Waktu'
+  },
+  {
+    id: 'tr-10',
+    mode: 'bus',
+    operator: 'DAMRI Royal Class',
+    code: 'DM-TransJawa',
+    routeFrom: 'Kemayoran Jakarta',
+    routeTo: 'Bungurasih Surabaya',
+    depTime: '19:15 WIB',
+    arrTime: '05:30 WIB',
+    terminalGate: 'Jalur Keberangkatan A1',
+    status: 'Tepat Waktu'
+  }
+];
+

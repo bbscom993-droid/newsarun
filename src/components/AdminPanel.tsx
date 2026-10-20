@@ -136,6 +136,25 @@ export default function AdminPanel({
     setIsArticleModalOpen(true);
   };
 
+  const openAddVideoArticle = () => {
+    setEditingArticleId(null);
+    setFormTitle('Warta Video: ');
+    setFormCategory('Daerah');
+    setFormSummary('Liputan video eksklusif redaksi Arun News...');
+    setFormContent('Tayangan liputan video dokumentasi peristiwa langsung oleh jurnalis lapangan Arun News.');
+    setFormAuthorName('Tim Liputan Video Arun News');
+    setFormAuthorRole('Divisi Multimedia & Penyiaran');
+    setFormImageUrl('https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80');
+    setFormVideoUrl('');
+    setFormIsVideo(true);
+    setVideoFileName('');
+    setImageFileName('');
+    setFormIsHeadline(false);
+    setFormIsBreaking(false);
+    setFormTags('Warta Video, Liputan Khusus, Multimedia');
+    setIsArticleModalOpen(true);
+  };
+
   const openEditArticle = (art: Article) => {
     setEditingArticleId(art.id);
     setFormTitle(art.title);
@@ -583,22 +602,32 @@ export default function AdminPanel({
           {/* TAB 2: ARTICLES MANAGEMENT */}
           {activeTab === 'articles' && (
             <div className="p-5 rounded-xl border bg-[#091f3d] border-blue-700/60 text-white shadow-xl">
-              <div className="flex items-center justify-between pb-4 border-b border-blue-800 mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-blue-800 mb-4">
                 <div>
                   <h3 className="font-extrabold text-base text-white">
                     Kelola Seluruh Berita ({articles.length})
                   </h3>
                   <p className="text-xs text-blue-200">
-                    Kategori: Politik, Daerah, Kriminal, Lain-lain, Olahraga, Legalitas, Lapor Warga
+                    Kategori: Politik, Daerah, Kriminal, Lain-lain, Olahraga, Legalitas, Ekonomi, Lapor Warga
                   </p>
                 </div>
-                <button
-                  onClick={openAddArticle}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs rounded-xl transition-colors shadow-xs"
-                >
-                  <Plus className="w-4 h-4 text-slate-950" />
-                  <span>Tambah Berita</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={openAddVideoArticle}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white font-black text-xs rounded-xl transition-all shadow-md"
+                    title="Upload video berita dari lokal untuk tayang di Warta Video"
+                  >
+                    <Video className="w-4 h-4 text-white" />
+                    <span>Upload Video Berita Lokal</span>
+                  </button>
+                  <button
+                    onClick={openAddArticle}
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs rounded-xl transition-colors shadow-xs"
+                  >
+                    <Plus className="w-4 h-4 text-slate-950" />
+                    <span>Tambah Berita Teks</span>
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-x-auto">
@@ -1401,6 +1430,7 @@ export default function AdminPanel({
                     <option value="Lain-lain" className="bg-[#071933] text-white">Lain-lain</option>
                     <option value="Olahraga" className="bg-[#071933] text-white">Olahraga</option>
                     <option value="Legalitas" className="bg-[#071933] text-white">Legalitas</option>
+                    <option value="Ekonomi" className="bg-[#071933] text-white">Ekonomi</option>
                     <option value="Lapor Warga" className="bg-[#071933] text-white">Lapor Warga</option>
                   </select>
                 </div>
