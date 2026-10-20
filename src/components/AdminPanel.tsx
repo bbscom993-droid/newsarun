@@ -21,7 +21,8 @@ import {
   Film,
   ShieldAlert,
   Sliders,
-  RotateCcw
+  RotateCcw,
+  LogOut
 } from 'lucide-react';
 import { Article, AdSlot, CitizenReport, CoffeeTip, NewsCategory, LaporWargaConfig } from '../data/newsData';
 
@@ -42,6 +43,8 @@ interface AdminPanelProps {
   onUpdateCustomLogo: (logoUrl: string | undefined) => void;
   laporConfig: LaporWargaConfig;
   onUpdateLaporConfig: (config: LaporWargaConfig) => void;
+  adminEmail?: string;
+  onLogout?: () => void;
 }
 
 export default function AdminPanel({
@@ -60,7 +63,9 @@ export default function AdminPanel({
   customLogoUrl,
   onUpdateCustomLogo,
   laporConfig,
-  onUpdateLaporConfig
+  onUpdateLaporConfig,
+  adminEmail,
+  onLogout
 }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'articles' | 'reports' | 'lapor_settings' | 'ads' | 'coffee' | 'settings'>('overview');
 
@@ -125,7 +130,7 @@ export default function AdminPanel({
     setFormContent('');
     setFormAuthorName('Redaksi Arun News');
     setFormAuthorRole('Wartawan Redaksi');
-    setFormImageUrl('/src/assets/images/hero_headline_summit_1792424745951.jpg');
+    setFormImageUrl('/images/hero_headline_summit_1792424745951.jpg');
     setFormVideoUrl('');
     setFormIsVideo(false);
     setVideoFileName('');
@@ -397,7 +402,17 @@ export default function AdminPanel({
 
         <div className="flex items-center gap-2 text-xs">
           <span className="hidden sm:inline text-blue-200">Login sebagai:</span>
-          <span className="font-bold text-amber-300">Pemimpin Redaksi</span>
+          <span className="font-bold text-amber-300 truncate max-w-[160px]">{adminEmail || 'Pemimpin Redaksi'}</span>
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-950 hover:bg-red-900 text-[11px] font-bold text-blue-100 border border-blue-700/80 transition-colors"
+              title="Keluar dari panel redaksi"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Keluar</span>
+            </button>
+          )}
         </div>
       </header>
 
