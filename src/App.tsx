@@ -26,10 +26,11 @@ import AdSlotBanner from './components/AdSlotBanner';
 import Footer from './components/Footer';
 import FloatingSawerKopi from './components/FloatingSawerKopi';
 import LegalitasSection from './components/LegalitasSection';
+import AdminGate from './components/AdminGate';
+import { api } from './lib/api';
 import {
   INITIAL_ARTICLES,
   INITIAL_AD_SLOTS,
-  INITIAL_CITIZEN_REPORTS,
   INITIAL_COFFEE_TIPS,
   Article,
   AdSlot,
@@ -41,57 +42,13 @@ import {
 } from './data/newsData';
 
 export default function App() {
-  // Articles state with localStorage backup
-  const [articles, setArticles] = useState<Article[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('arun_articles');
-        if (saved) return JSON.parse(saved);
-      } catch {
-        return INITIAL_ARTICLES;
-      }
-    }
-    return INITIAL_ARTICLES;
-  });
-
-  // Ad slots state
-  const [adSlots, setAdSlots] = useState<AdSlot[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('arun_ad_slots');
-        if (saved) return JSON.parse(saved);
-      } catch {
-        return INITIAL_AD_SLOTS;
-      }
-    }
-    return INITIAL_AD_SLOTS;
-  });
-
-  // Citizen reports state
-  const [citizenReports, setCitizenReports] = useState<CitizenReport[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('arun_citizen_reports');
-        if (saved) return JSON.parse(saved);
-      } catch {
-        return INITIAL_CITIZEN_REPORTS;
-      }
-    }
-    return INITIAL_CITIZEN_REPORTS;
-  });
-
-  // Coffee tips state
-  const [coffeeTips, setCoffeeTips] = useState<CoffeeTip[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('arun_coffee_tips');
-        if (saved) return JSON.parse(saved);
-      } catch {
-        return INITIAL_COFFEE_TIPS;
-      }
-    }
-    return INITIAL_COFFEE_TIPS;
-  });
+  // Portal content is loaded from the shared database via /api/portal
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [adSlots, setAdSlots] = useState<AdSlot[]>([]);
+  const [citizenReports, setCitizenReports] = useState<CitizenReport[]>([]);
+  const [coffeeTips, setCoffeeTips] = useState<CoffeeTip[]>([]);
+  const [isPortalLoading, setIsPortalLoading] = useState(true);
+  const [isAdminAuthorized, setIsAdminAuthorized] = useState(false);
 
   const [activeCategory, setActiveCategory] = useState<string>('Semua');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -137,43 +94,45 @@ export default function App() {
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Local Logo State with LocalStorage Persistence
-  const [customLogoUrl, setCustomLogoUrl] = useState<string | undefined>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('arun_news_custom_logo') || undefined;
-    }
-    return undefined;
-  });
-
-  // Lapor Warga Config State with LocalStorage Persistence
-  const [laporConfig, setLaporConfig] = useState<LaporWargaConfig>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('arun_news_lapor_config');
-        if (saved) return JSON.parse(saved);
-      } catch {
-        return DEFAULT_LAPOR_WARGA_CONFIG;
-      }
-    }
-    return DEFAULT_LAPOR_WARGA_CONFIG;
-  });
-
-  // Sync to local storage
-  useEffect(() => {
-    localStorage.setItem('arun_articles', JSON.stringify(articles));
-  }, [articles]);
+  const [customLogoUrl, setCustomLogoUrl] = useState<string | undefined>(undefined);
+  const [laporConfig, setLaporConfig] = useState<LaporWargaConfig>(DEFAULT_LAPOR_WARGA_CONFIG);
 
   useEffect(() => {
-    localStorage.setItem('arun_ad_slots', JSON.stringify(adSlots));
-  }, [adSlots]);
+    let cancelled = false;
+    api
+      .getPortal()
+      .then((data) => {
+        if (cancelled) return;
+        setArticles(data.articles);
+        setAdSlots(data.adSlots);
+        setCoffeeTips(data.coffeeTips);
+        setCustomLogoUrl(data.customLogoUrl || undefined);
+        setLaporConfig({ ...DEFAULT_LAPOR_WARGA_CONFIG, ...(data.laporConfig || {}) });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        // Keep the portal readable with starter content if the API is unreachable.
+        setArticles(INITIAL_ARTICLES);
+        setAdSlots(INITIAL_AD_SLOTS);
+        setCoffeeTips(INITIAL_COFFEE_TIPS);
+        showToast('Gagal memuat data terbaru dari server.');
+      })
+      .finally(() => {
+        if (!cancelled) setIsPortalLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
+  // Citizen reports include reporter contacts, so they're only fetched for authorized editors.
   useEffect(() => {
-    localStorage.setItem('arun_citizen_reports', JSON.stringify(citizenReports));
-  }, [citizenReports]);
-
-  useEffect(() => {
-    localStorage.setItem('arun_coffee_tips', JSON.stringify(coffeeTips));
-  }, [coffeeTips]);
+    if (!isAdminAuthorized) return;
+    api
+      .listReports()
+      .then(setCitizenReports)
+      .catch((err: Error) => showToast(err.message));
+  }, [isAdminAuthorized]);
 
   useEffect(() => {
     localStorage.setItem('arun_saved_articles', JSON.stringify(savedIds));
@@ -195,6 +154,7 @@ export default function App() {
       const search = window.location.search;
       if (
         hash === '#admin' ||
+        /^#(invite_token|recovery_token|confirmation_token|email_change_token)=/.test(hash) ||
         hash === '#redaksi' ||
         search.includes('admin=true') ||
         window.location.pathname === '/admin'
@@ -265,14 +225,19 @@ export default function App() {
     window.open(waUrl, '_blank');
   };
 
-  const handleAddComment = (articleId: string, comment: CommentItem) => {
-    setArticles((prev) =>
-      prev.map((art) => (art.id === articleId ? { ...art, comments: [comment, ...art.comments] } : art))
-    );
-    if (selectedArticle && selectedArticle.id === articleId) {
-      setSelectedArticle((prev) => (prev ? { ...prev, comments: [comment, ...prev.comments] } : null));
+  const handleAddComment = async (articleId: string, comment: CommentItem) => {
+    try {
+      const saved = await api.addComment(articleId, comment);
+      setArticles((prev) =>
+        prev.map((art) => (art.id === articleId ? { ...art, comments: [saved, ...art.comments] } : art))
+      );
+      setSelectedArticle((prev) =>
+        prev && prev.id === articleId ? { ...prev, comments: [saved, ...prev.comments] } : prev
+      );
+      showToast('Komentar Anda berhasil dipublikasikan!');
+    } catch (err) {
+      showToast((err as Error).message);
     }
-    showToast('Komentar Anda berhasil dipublikasikan!');
   };
 
   const handleOpenSawerKopi = (contextTitle?: string) => {
@@ -280,65 +245,83 @@ export default function App() {
     setIsSawerKopiOpen(true);
   };
 
-  const handleAddCoffeeTip = (tip: CoffeeTip) => {
-    setCoffeeTips((prev) => [tip, ...prev]);
-    showToast(`Terima kasih atas sawer kopi Rp ${tip.amount.toLocaleString('id-ID')}!`);
+  const handleAddCoffeeTip = async (tip: CoffeeTip) => {
+    try {
+      const saved = await api.addTip(tip);
+      setCoffeeTips((prev) => [saved, ...prev]);
+      showToast(`Terima kasih atas sawer kopi Rp ${saved.amount.toLocaleString('id-ID')}!`);
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
-  const handleAddCitizenReport = (report: CitizenReport) => {
-    setCitizenReports((prev) => [report, ...prev]);
-    showToast('Laporan warga Anda telah diterima oleh redaksi!');
+  const handleAddCitizenReport = async (report: CitizenReport) => {
+    try {
+      const saved = await api.addReport(report);
+      if (isAdminAuthorized) setCitizenReports((prev) => [saved, ...prev]);
+      showToast('Laporan warga Anda telah diterima oleh redaksi!');
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
   // Admin Actions
-  const handleAddArticle = (newArt: Article) => {
-    setArticles((prev) => [newArt, ...prev]);
-    showToast('Berita baru berhasil diterbitkan!');
+  const handleAddArticle = async (newArt: Article) => {
+    try {
+      const saved = await api.createArticle(newArt);
+      setArticles((prev) => [saved, ...prev]);
+      showToast('Berita baru berhasil diterbitkan!');
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
-  const handleUpdateArticle = (updatedArt: Article) => {
-    setArticles((prev) => prev.map((a) => (a.id === updatedArt.id ? updatedArt : a)));
-    showToast('Berita berhasil diperbarui!');
+  const handleUpdateArticle = async (updatedArt: Article) => {
+    try {
+      const saved = await api.updateArticle(updatedArt);
+      setArticles((prev) => prev.map((a) => (a.id === saved.id ? saved : a)));
+      showToast('Berita berhasil diperbarui!');
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
-  const handleDeleteArticle = (articleId: string) => {
-    setArticles((prev) => prev.filter((a) => a.id !== articleId));
-    showToast('Berita berhasil dihapus.');
+  const handleDeleteArticle = async (articleId: string) => {
+    try {
+      await api.deleteArticle(articleId);
+      setArticles((prev) => prev.filter((a) => a.id !== articleId));
+      showToast('Berita berhasil dihapus.');
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
-  const handleUpdateAdSlot = (updatedSlot: AdSlot) => {
-    setAdSlots((prev) => prev.map((s) => (s.id === updatedSlot.id ? updatedSlot : s)));
-    showToast('Slot iklan berhasil diperbarui!');
+  const handleUpdateAdSlot = async (updatedSlot: AdSlot) => {
+    try {
+      const saved = await api.updateAdSlot(updatedSlot);
+      setAdSlots((prev) => prev.map((s) => (s.id === saved.id ? saved : s)));
+      showToast('Slot iklan berhasil diperbarui!');
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
-  const handleSubscribeAdSlot = (
+  const handleSubscribeAdSlot = async (
     slotId: string,
     data: { brandName: string; bannerUrl: string; targetUrl: string; durationDays: number }
   ) => {
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() + data.durationDays);
-
-    setAdSlots((prev) =>
-      prev.map((s) => {
-        if (s.id === slotId) {
-          return {
-            ...s,
-            currentSponsor: {
-              brandName: data.brandName,
-              bannerUrl: data.bannerUrl,
-              targetUrl: data.targetUrl,
-              expiredAt: expiredDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-            }
-          };
-        }
-        return s;
-      })
-    );
-    showToast(`Slot iklan ${slotId} berhasil dilanggani untuk ${data.brandName}!`);
+    try {
+      const saved = await api.subscribeAdSlot(slotId, data);
+      setAdSlots((prev) => prev.map((s) => (s.id === saved.id ? saved : s)));
+      showToast(`Slot iklan ${slotId} berhasil dilanggani untuk ${data.brandName}!`);
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
   // Convert citizen report to published article
-  const handlePublishCitizenReport = (report: CitizenReport) => {
+  const handlePublishCitizenReport = async (report: CitizenReport) => {
+    const now = new Date();
     const newArt: Article = {
       id: `art-citizen-${Date.now()}`,
       title: `[Lapor Warga] ${report.title}`,
@@ -360,26 +343,37 @@ export default function App() {
         role: 'Jurnalisme Warga Arun News',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'
       },
-      publishedAt: '19 Okt 2026, 15:30 WIB',
+      publishedAt: `${now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}, ${now
+        .toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })
+        .replace('.', ':')} WIB`,
       readTime: '2 mnt baca',
       imageUrl: report.photoUrl || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&auto=format&fit=crop&q=80',
       imageCaption: `Kondisi lapangan yang dilaporkan warga di ${report.location}.`,
-      viewsCount: 450,
-      sharesCount: 30,
+      viewsCount: 0,
+      sharesCount: 0,
       tags: ['Lapor Warga', 'Aspirasi Daerah'],
       comments: []
     };
 
-    setArticles((prev) => [newArt, ...prev]);
-    setCitizenReports((prev) =>
-      prev.map((r) => (r.id === report.id ? { ...r, status: 'published' } : r))
-    );
-    showToast('Laporan warga berhasil diterbitkan sebagai berita!');
+    try {
+      const savedArticle = await api.createArticle(newArt);
+      const savedReport = await api.updateReport({ ...report, status: 'published' });
+      setArticles((prev) => [savedArticle, ...prev]);
+      setCitizenReports((prev) => prev.map((r) => (r.id === savedReport.id ? savedReport : r)));
+      showToast('Laporan warga berhasil diterbitkan sebagai berita!');
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
-  const handleDeleteCitizenReport = (reportId: string) => {
-    setCitizenReports((prev) => prev.filter((r) => r.id !== reportId));
-    showToast('Laporan warga dihapus.');
+  const handleDeleteCitizenReport = async (reportId: string) => {
+    try {
+      await api.deleteReport(reportId);
+      setCitizenReports((prev) => prev.filter((r) => r.id !== reportId));
+      showToast('Laporan warga dihapus.');
+    } catch (err) {
+      showToast((err as Error).message);
+    }
   };
 
   // Filtered Articles for Portal
@@ -390,14 +384,40 @@ export default function App() {
   });
 
   const leadArticle = articles.find((a) => a.isHeadline) || articles[0];
-  const secondaryArticles = articles.filter((a) => a.id !== leadArticle.id && a.isEditorPick).slice(0, 2);
+  const secondaryArticles = articles.filter((a) => a.id !== leadArticle?.id && a.isEditorPick).slice(0, 2);
   const headerAdSlot = adSlots.find((s) => s.position === 'header_leaderboard');
   const savedArticlesList = articles.filter((a) => savedIds.includes(a.id));
+
+  const toastNode = toastMessage && (
+    <div className="fixed bottom-6 right-6 z-[100] bg-blue-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-amber-400 text-xs font-bold flex items-center gap-2 animate-in slide-in-from-bottom duration-200">
+      <span className="w-2 h-2 rounded-full bg-amber-400" />
+      <span>{toastMessage}</span>
+    </div>
+  );
+
+  const exitAdmin = () => {
+    setIsAdminAuthorized(false);
+    setCitizenReports([]);
+    window.location.hash = '';
+    setViewMode('portal');
+  };
+
+  const loadingScreen = (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[#0c2447] text-slate-100">
+      <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+      <p className="text-xs font-bold uppercase tracking-widest text-amber-300">Memuat Arun News...</p>
+    </div>
+  );
 
   // IF ADMIN VIEW MODE
   if (viewMode === 'admin') {
     return (
+      <>
+      <AdminGate darkMode={darkMode} onExit={exitAdmin} onAuthorizedChange={setIsAdminAuthorized}>
+      {(session) => isPortalLoading ? loadingScreen : (
       <AdminPanel
+        adminEmail={session.email}
+        onLogout={session.logout}
         articles={articles}
         onAddArticle={handleAddArticle}
         onUpdateArticle={handleUpdateArticle}
@@ -408,33 +428,37 @@ export default function App() {
         onPublishReport={handlePublishCitizenReport}
         onDeleteReport={handleDeleteCitizenReport}
         coffeeTips={coffeeTips}
-        onExitAdmin={() => {
-          window.location.hash = '';
-          setViewMode('portal');
-        }}
+        onExitAdmin={exitAdmin}
         darkMode={darkMode}
         customLogoUrl={customLogoUrl}
-        onUpdateCustomLogo={(logo) => {
-          setCustomLogoUrl(logo);
-          if (logo) {
-            localStorage.setItem('arun_news_custom_logo', logo);
-            setToastMessage('Logo resmi lokal berhasil diperbarui!');
-          } else {
-            localStorage.removeItem('arun_news_custom_logo');
-            setToastMessage('Logo dikembalikan ke simbol default!');
+        onUpdateCustomLogo={async (logo) => {
+          try {
+            await api.updateSetting('logo', logo ?? null);
+            setCustomLogoUrl(logo);
+            showToast(logo ? 'Logo resmi berhasil diperbarui!' : 'Logo dikembalikan ke simbol default!');
+          } catch (err) {
+            showToast((err as Error).message);
           }
-          setTimeout(() => setToastMessage(null), 3000);
         }}
         laporConfig={laporConfig}
-        onUpdateLaporConfig={(cfg) => {
-          setLaporConfig(cfg);
-          localStorage.setItem('arun_news_lapor_config', JSON.stringify(cfg));
-          setToastMessage('Pengaturan Lapor Warga berhasil disimpan!');
-          setTimeout(() => setToastMessage(null), 3000);
+        onUpdateLaporConfig={async (cfg) => {
+          try {
+            await api.updateSetting('lapor_config', cfg);
+            setLaporConfig(cfg);
+            showToast('Pengaturan Lapor Warga berhasil disimpan!');
+          } catch (err) {
+            showToast((err as Error).message);
+          }
         }}
       />
+      )}
+      </AdminGate>
+      {toastNode}
+      </>
     );
   }
+
+  if (isPortalLoading) return loadingScreen;
 
   // PORTAL VIEW MODE
   return (
@@ -488,18 +512,14 @@ export default function App() {
       />
 
       {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-blue-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-amber-400 text-xs font-bold flex items-center gap-2 animate-in slide-in-from-bottom duration-200">
-          <span className="w-2 h-2 rounded-full bg-amber-400" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+      {toastNode}
 
       {/* Main News Layout */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full text-white">
         {/* Front Page Featured Sections */}
         {activeCategory === 'Semua' && !selectedTag && (
           <>
+            {leadArticle && (
             <HeroHeadlines
               leadArticle={leadArticle}
               secondaryArticles={secondaryArticles}
@@ -510,6 +530,7 @@ export default function App() {
               onOpenSawerKopi={handleOpenSawerKopi}
               darkMode={darkMode}
             />
+            )}
 
             {/* Prakiraan Cuaca & Jadwal Transportasi Nusantara */}
             <PublicServicesWidget darkMode={darkMode} />
