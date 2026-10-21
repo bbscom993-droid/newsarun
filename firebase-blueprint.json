@@ -1,0 +1,112 @@
+{
+  "entities": {
+    "Article": {
+      "title": "Article",
+      "description": "Berita dan liputan jurnalistik resmi Arun News",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 300 },
+        "slug": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "enum": ["Politik", "Daerah", "Kriminal", "Lain-lain", "Olahraga", "Legalitas", "Ekonomi", "Lapor Warga"] },
+        "summary": { "type": "string", "maxLength": 1000 },
+        "content": { "type": "array" },
+        "keyPoints": { "type": "array" },
+        "author": { "type": "object" },
+        "publishedAt": { "type": "string" },
+        "readTime": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "imageCaption": { "type": "string" },
+        "viewsCount": { "type": "number" },
+        "sharesCount": { "type": "number" },
+        "isBreaking": { "type": "boolean" },
+        "isEditorPick": { "type": "boolean" },
+        "isHeadline": { "type": "boolean" },
+        "isVideo": { "type": "boolean" },
+        "videoUrl": { "type": "string" },
+        "tags": { "type": "array" }
+      },
+      "required": ["id", "title", "category", "summary"]
+    },
+    "CitizenReport": {
+      "title": "CitizenReport",
+      "description": "Laporan peristiwa dari warga masyarakat melalui kanal Lapor Warga",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 200 },
+        "location": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "reporterName": { "type": "string", "maxLength": 100 },
+        "reporterPhone": { "type": "string", "maxLength": 50 },
+        "reporterEmail": { "type": "string", "maxLength": 100 },
+        "photoUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "verified", "published", "rejected"] },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "title", "location", "description", "reporterName", "status"]
+    },
+    "CoffeeTip": {
+      "title": "CoffeeTip",
+      "description": "Dukungan sawer kopi donatur untuk operasional redaksi independen",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "supporterName": { "type": "string", "maxLength": 100 },
+        "amount": { "type": "number" },
+        "message": { "type": "string", "maxLength": 500 },
+        "timestamp": { "type": "string" },
+        "paymentMethod": { "type": "string" }
+      },
+      "required": ["id", "supporterName", "amount", "timestamp"]
+    },
+    "AdSlot": {
+      "title": "AdSlot",
+      "description": "Slot banner sponsor periklanan portal Arun News",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "position": { "type": "string" },
+        "name": { "type": "string" },
+        "dimensions": { "type": "string" },
+        "pricePerWeek": { "type": "number" },
+        "currentSponsor": { "type": "object" }
+      },
+      "required": ["id", "position", "name"]
+    },
+    "PortalConfig": {
+      "title": "PortalConfig",
+      "description": "Pengaturan identitas portal, logo lokal, dan konfigurasi Lapor Warga",
+      "type": "object",
+      "properties": {
+        "portalName": { "type": "string" },
+        "portalSlogan": { "type": "string" },
+        "editorialOffice": { "type": "string" },
+        "customLogoUrl": { "type": "string" },
+        "laporConfig": { "type": "object" }
+      }
+    }
+  },
+  "firestore": {
+    "/articles/{articleId}": {
+      "schema": { "$ref": "#/entities/Article" },
+      "description": "Koleksi berita publik portal Arun News"
+    },
+    "/citizenReports/{reportId}": {
+      "schema": { "$ref": "#/entities/CitizenReport" },
+      "description": "Koleksi aspirasi dan laporan warga masyarakat"
+    },
+    "/coffeeTips/{tipId}": {
+      "schema": { "$ref": "#/entities/CoffeeTip" },
+      "description": "Koleksi donasi sawer kopi redaksi"
+    },
+    "/adSlots/{slotId}": {
+      "schema": { "$ref": "#/entities/AdSlot" },
+      "description": "Status slot tayang iklan sponsor"
+    },
+    "/portalConfig/{configId}": {
+      "schema": { "$ref": "#/entities/PortalConfig" },
+      "description": "Pengaturan portal dan identitas redaksi"
+    }
+  }
+}

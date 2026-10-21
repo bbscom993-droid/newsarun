@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Test connection doc
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    // Articles collection - Publicly readable
+    match /articles/{articleId} {
+      allow read: if true;
+      allow create, update: if isValidId(articleId)
+        && incoming().title is string && incoming().title.size() <= 300
+        && incoming().category is string
+        && incoming().summary is string && incoming().summary.size() <= 1500;
+      allow delete: if isValidId(articleId);
+    }
+
+    // Citizen Reports collection - Citizens can submit, read/update for editorial review
+    match /citizenReports/{reportId} {
+      allow read: if true;
+      allow create: if isValidId(reportId)
+        && incoming().title is string && incoming().title.size() <= 200
+        && incoming().location is string && incoming().location.size() <= 150
+        && incoming().description is string && incoming().description.size() <= 2000
+        && incoming().reporterName is string && incoming().reporterName.size() <= 100;
+      allow update, delete: if isValidId(reportId);
+    }
+
+    // Sawer Kopi Coffee Tips collection - Public read and donation submission
+    match /coffeeTips/{tipId} {
+      allow read: if true;
+      allow create: if isValidId(tipId)
+        && incoming().supporterName is string && incoming().supporterName.size() <= 100
+        && incoming().amount is number && incoming().amount > 0;
+      allow update, delete: if false;
+    }
+
+    // Ad Slots collection
+    match /adSlots/{slotId} {
+      allow read: if true;
+      allow update: if isValidId(slotId)
+        && incoming().name is string;
+      allow create, delete: if false;
+    }
+
+    // Portal Configuration
+    match /portalConfig/{configId} {
+      allow read: if true;
+      allow write: if isValidId(configId);
+    }
+  }
+}

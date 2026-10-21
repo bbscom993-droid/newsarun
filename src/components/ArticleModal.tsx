@@ -6,8 +6,11 @@ import {
   Share2,
   Bookmark,
   Printer,
+  FileDown,
+  FileText,
   Sparkles,
   Check,
+  CheckCircle,
   ThumbsUp,
   Send,
   ArrowLeft,
@@ -17,6 +20,7 @@ import {
   Play
 } from 'lucide-react';
 import { Article, CommentItem } from '../data/newsData';
+import WhatsAppShareModal from './WhatsAppShareModal';
 
 interface ArticleModalProps {
   article: Article | null;
@@ -43,6 +47,8 @@ export default function ArticleModal({
 }: ArticleModalProps) {
   const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg'>('base');
   const [copiedLink, setCopiedLink] = useState(false);
+  const [actionToast, setActionToast] = useState<string | null>(null);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [commentName, setCommentName] = useState('');
   const [commentText, setCommentText] = useState('');
   const [localLikes, setLocalLikes] = useState<{ [commentId: string]: number }>({});
@@ -75,9 +81,7 @@ export default function ArticleModal({
   };
 
   const handleShareWhatsApp = () => {
-    const message = getFullShareMessage();
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    window.open(waUrl, '_blank');
+    setIsWhatsAppModalOpen(true);
   };
 
   const handleCopyLink = () => {
@@ -92,6 +96,22 @@ export default function ArticleModal({
     navigator.clipboard.writeText(fullText);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2500);
+  };
+
+  const handleDownloadPDF = () => {
+    setActionToast('Menyiapkan naskah berita PDF... Silakan pilih opsi "Simpan sebagai PDF" (Save as PDF) pada jendela cetak.');
+    setTimeout(() => {
+      window.print();
+    }, 300);
+    setTimeout(() => setActionToast(null), 4000);
+  };
+
+  const handlePrint = () => {
+    setActionToast('Membuka tata letak naskah resmi redaksi untuk dicetak...');
+    setTimeout(() => {
+      window.print();
+    }, 300);
+    setTimeout(() => setActionToast(null), 3000);
   };
 
   const handleLikeComment = (cId: string, currentLikes: number) => {
@@ -117,6 +137,8 @@ export default function ArticleModal({
     onAddComment(article.id, newComment);
     setCommentName('');
     setCommentText('');
+    setActionToast('Komentar Anda berhasil dikirim ke ruang tanggapan pembaca!');
+    setTimeout(() => setActionToast(null), 3500);
   };
 
   const getFontSizeClass = () => {
@@ -200,6 +222,26 @@ export default function ArticleModal({
               <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-slate-950' : ''}`} />
             </button>
 
+            {/* Unduh PDF Button */}
+            <button
+              onClick={handleDownloadPDF}
+              className="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+              title="Unduh Naskah Berita Format PDF"
+            >
+              <FileDown className="w-4 h-4 text-slate-950" />
+              <span className="hidden sm:inline">Unduh PDF</span>
+            </button>
+
+            {/* Cetak Naskah Berita Button */}
+            <button
+              onClick={handlePrint}
+              className="p-2 sm:px-3 sm:py-1.5 rounded-lg border border-blue-700 bg-blue-900/90 hover:bg-blue-800 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+              title="Cetak Naskah Berita"
+            >
+              <Printer className="w-4 h-4 text-amber-300" />
+              <span className="hidden sm:inline">Cetak Naskah</span>
+            </button>
+
             {/* WhatsApp Direct Share Button */}
             <button
               onClick={handleShareWhatsApp}
@@ -217,15 +259,6 @@ export default function ArticleModal({
               title="Salin Tautan Langsung"
             >
               {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
-            </button>
-
-            {/* Print button */}
-            <button
-              onClick={() => window.print()}
-              className="hidden sm:flex p-2 rounded-lg border border-blue-800 bg-blue-950 text-blue-200 hover:text-white hover:bg-blue-900 transition-colors"
-              title="Cetak Berita"
-            >
-              <Printer className="w-4 h-4" />
             </button>
 
             {/* Close Modal */}
@@ -246,8 +279,36 @@ export default function ArticleModal({
           </div>
         )}
 
+        {/* Action toast indicator (PDF, Cetak, Komentar) */}
+        {actionToast && (
+          <div className="bg-blue-900 text-amber-300 text-xs py-1.5 px-4 text-center font-bold border-b border-amber-400/30 flex items-center justify-center gap-1.5 animate-in fade-in">
+            <CheckCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span>{actionToast}</span>
+          </div>
+        )}
+
         {/* Scrollable Article Body with high contrast black typography */}
-        <div className="p-5 sm:p-8 space-y-6 overflow-y-auto flex-1">
+        <div className="p-5 sm:p-8 space-y-6 overflow-y-auto flex-1 print-article-container">
+          {/* OFFICIAL DOCUMENT LETTERHEAD (PRINT / PDF ONLY) */}
+          <div className="hidden print:block pb-4 mb-4 border-b-2 border-black">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-black text-black tracking-tight">ARUN NEWS</h1>
+                <p className="text-xs uppercase font-extrabold tracking-wider text-gray-700">Jembatan Media Nusantara</p>
+                <p className="text-[10px] text-gray-600 mt-0.5">Terverifikasi Faktual Dewan Pers RI · SK Kemenkumham: AHU-0029182.AH.01.01.TAHUN 2024</p>
+              </div>
+              <div className="text-right text-[10px] text-gray-700 leading-tight">
+                <p className="font-bold">KANTOR REDAKSI:</p>
+                <p>Gg Gaya, Pasar minggu, kec, Pasar minggu</p>
+                <p>Jakarta Selatan, DKI JAKARTA, Indonesia</p>
+                <p className="font-bold text-black mt-1">Hotline Redaksi: 0895626941900</p>
+              </div>
+            </div>
+            <div className="mt-2 pt-2 border-t border-dashed border-gray-400 flex justify-between text-[10px] text-gray-600">
+              <span>DOKUMEN NASKAH RESMI PERS · ARSIP DIGITAL</span>
+              <span>Kanal: {article.category} · Tanggal Rilis: {article.publishedAt}</span>
+            </div>
+          </div>
           {/* Category & Status Header */}
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 bg-blue-900 text-amber-400 font-black text-xs tracking-wider uppercase rounded shadow-xs">
@@ -388,6 +449,39 @@ export default function ArticleModal({
             })}
           </div>
 
+          {/* Quick Actions Bar: Unduh PDF & Cetak Naskah Berita */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950 via-[#0a2347] to-blue-950 border border-blue-700/80 shadow-md space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h4 className="font-black text-sm text-white flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-amber-400" />
+                  <span>Dokumentasi Resmi & Publikasi Berita</span>
+                </h4>
+                <p className="text-xs text-blue-200">
+                  Unduh naskah berita dalam format PDF arsip atau cetak naskah langsung untuk referensi dan arsip redaksi.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  onClick={handleDownloadPDF}
+                  className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+                  title="Unduh format PDF dokumen berita"
+                >
+                  <FileDown className="w-3.5 h-3.5 text-slate-950" />
+                  <span>Unduh PDF</span>
+                </button>
+                <button
+                  onClick={handlePrint}
+                  className="px-3.5 py-2 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs border border-blue-700 flex items-center gap-1.5 transition-colors shadow-xs"
+                  title="Cetak lembar naskah berita resmi"
+                >
+                  <Printer className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Cetak Naskah</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* WhatsApp Direct Share Bar with requested format */}
           <div className="p-4 rounded-2xl bg-blue-950 border border-blue-700/80 space-y-3 text-white">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -423,13 +517,23 @@ export default function ArticleModal({
             </div>
           </div>
 
-          {/* Comments Section */}
+          {/* Kolom Komentar Setiap Berita */}
           <div className="pt-6 border-t border-blue-800/80">
-            <div className="flex items-center gap-2 mb-4">
-              <MessageSquare className="w-5 h-5 text-amber-400" />
-              <h3 className="text-lg font-black text-white">
-                Tanggapan Pembaca ({article.comments.length})
-              </h3>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-amber-400" />
+                <div>
+                  <h3 className="text-lg font-black text-white">
+                    Kolom Komentar & Diskusi Publik ({article.comments.length})
+                  </h3>
+                  <p className="text-[11px] text-blue-300">
+                    Sampaikan pandangan, masukan, dan tanggapan berimbang Anda atas liputan ini.
+                  </p>
+                </div>
+              </div>
+              <span className="text-[11px] px-2 py-0.5 rounded bg-blue-900 text-amber-300 border border-amber-400/30 font-bold">
+                Moderasi Aktif
+              </span>
             </div>
 
             <form onSubmit={handleSubmitComment} className="mb-6 space-y-3">
@@ -496,10 +600,25 @@ export default function ArticleModal({
               })}
             </div>
           </div>
+
+          {/* OFFICIAL PRINT & PDF FOOTER */}
+          <div className="hidden print:block pt-4 mt-6 border-t-2 border-black text-[10px] text-gray-700">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="font-bold text-black uppercase">PT ARUN MEDIA NUSANTARA · DILINDUNGI UNDANG-UNDANG</p>
+                <p>Naskah ini merupakan salinan dokumen resmi berita yang dipublikasikan oleh Redaksi Arun News.</p>
+                <p>Alamat: Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia</p>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-black">Hotline Redaksi: 0895626941900</p>
+                <p>Email: redaksi@arunnews.id · Portal: arunnews.id</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* FLOATING SAWER KOPI BUTTON INSIDE READER MODAL (Requested) */}
-        <div className="sticky bottom-4 right-4 self-end z-30 mr-4 mb-4">
+        <div className="sticky bottom-4 right-4 self-end z-30 mr-4 mb-4 print:hidden">
           <button
             onClick={() => onOpenSawerKopi(article.title)}
             className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs rounded-full shadow-xl transition-all duration-300 hover:scale-105 border-2 border-white ring-2 ring-amber-400/50"
@@ -510,6 +629,14 @@ export default function ArticleModal({
           </button>
         </div>
       </div>
+
+      {/* WhatsApp Smart Share Modal (Gambar + Teks + Link) */}
+      <WhatsAppShareModal
+        article={article}
+        isOpen={isWhatsAppModalOpen}
+        onClose={() => setIsWhatsAppModalOpen(false)}
+        darkMode={darkMode}
+      />
     </div>
   );
 }

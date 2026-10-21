@@ -106,3 +106,42 @@
     width: 100%;
   }
 }
+
+/* Official Print & PDF Export Styling */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide background elements, navigation, ads, buttons during print/PDF */
+  header, footer, nav, .sticky, button, .no-print, [role="dialog"] > div > div:first-child, .brand-3d-container {
+    box-shadow: none !important;
+  }
+
+  /* Ensure article text is crisp black on white */
+  .print-article-container {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .print-article-container * {
+    color: #111827 !important;
+    text-shadow: none !important;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}
+

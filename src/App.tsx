@@ -21,11 +21,14 @@ import SearchModal from './components/SearchModal';
 import SawerKopiModal from './components/SawerKopiModal';
 import LaporWargaModal from './components/LaporWargaModal';
 import EditorialInfoModal, { EditorialModalTab } from './components/EditorialInfoModal';
+import WhatsAppShareModal from './components/WhatsAppShareModal';
 import AdminPanel from './components/AdminPanel';
 import AdSlotBanner from './components/AdSlotBanner';
 import Footer from './components/Footer';
 import FloatingSawerKopi from './components/FloatingSawerKopi';
 import LegalitasSection from './components/LegalitasSection';
+import { db } from './firebase';
+import { collection, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import {
   INITIAL_ARTICLES,
   INITIAL_AD_SLOTS,
@@ -104,6 +107,7 @@ export default function App() {
   const [sawerKopiContextTitle, setSawerKopiContextTitle] = useState<string | undefined>(undefined);
   const [isLaporWargaOpen, setIsLaporWargaOpen] = useState(false);
   const [editorialModalTab, setEditorialModalTab] = useState<EditorialModalTab | null>(null);
+  const [shareModalArticle, setShareModalArticle] = useState<Article | null>(null);
 
   // View Mode: 'portal' or 'admin'
   const [viewMode, setViewMode] = useState<'portal' | 'admin'>(() => {
@@ -188,6 +192,55 @@ export default function App() {
     }
   }, [darkMode]);
 
+  // Real-time synchronization with Firebase Firestore
+  useEffect(() => {
+    try {
+      const unsubArticles = onSnapshot(collection(db, 'articles'), (snap) => {
+        if (!snap.empty) {
+          const remoteArts: Article[] = [];
+          snap.forEach((d) => remoteArts.push(d.data() as Article));
+          if (remoteArts.length > 0) {
+            setArticles(remoteArts);
+          }
+        }
+      }, (err) => {
+        console.warn('Firestore articles listener notice:', err.message);
+      });
+
+      const unsubReports = onSnapshot(collection(db, 'citizenReports'), (snap) => {
+        if (!snap.empty) {
+          const remoteReports: CitizenReport[] = [];
+          snap.forEach((d) => remoteReports.push(d.data() as CitizenReport));
+          if (remoteReports.length > 0) {
+            setCitizenReports(remoteReports);
+          }
+        }
+      }, (err) => {
+        console.warn('Firestore reports listener notice:', err.message);
+      });
+
+      const unsubTips = onSnapshot(collection(db, 'coffeeTips'), (snap) => {
+        if (!snap.empty) {
+          const remoteTips: CoffeeTip[] = [];
+          snap.forEach((d) => remoteTips.push(d.data() as CoffeeTip));
+          if (remoteTips.length > 0) {
+            setCoffeeTips(remoteTips);
+          }
+        }
+      }, (err) => {
+        console.warn('Firestore coffee tips listener notice:', err.message);
+      });
+
+      return () => {
+        unsubArticles();
+        unsubReports();
+        unsubTips();
+      };
+    } catch (e) {
+      console.warn('Firebase real-time sync initialization notice:', e);
+    }
+  }, []);
+
   // Deep linking and hash/URL change listener for dedicated admin link
   useEffect(() => {
     const handleUrlState = () => {
@@ -253,16 +306,9 @@ export default function App() {
 
   const isBookmarked = (articleId: string) => savedIds.includes(articleId);
 
-  // WhatsApp Share with specific image + text + link format
+  // WhatsApp Share with smart modal (Image + Text + Link)
   const handleShare = (article: Article) => {
-    const origin = window.location.origin;
-    const path = window.location.pathname;
-    const deepLink = `${origin}${path}#article-${article.id}`;
-    const imgUrl = article.imageUrl.startsWith('http') ? article.imageUrl : origin + article.imageUrl;
-
-    const message = `📰 *${article.title}*\n\n_${article.summary}_\n\n📸 *Foto Berita:* ${imgUrl}\n\n🔗 *Baca Selengkapnya di ARUN NEWS:*\n${deepLink}`;
-    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    window.open(waUrl, '_blank');
+    setShareModalArticle(article);
   };
 
   const handleAddComment = (articleId: string, comment: CommentItem) => {
@@ -280,30 +326,55 @@ export default function App() {
     setIsSawerKopiOpen(true);
   };
 
-  const handleAddCoffeeTip = (tip: CoffeeTip) => {
+  const handleAddCoffeeTip = async (tip: CoffeeTip) => {
     setCoffeeTips((prev) => [tip, ...prev]);
     showToast(`Terima kasih atas sawer kopi Rp ${tip.amount.toLocaleString('id-ID')}!`);
+    try {
+      await setDoc(doc(db, 'coffeeTips', tip.id), tip);
+    } catch (e) {
+      console.warn('Firestore tip write notice:', e);
+    }
   };
 
-  const handleAddCitizenReport = (report: CitizenReport) => {
+  const handleAddCitizenReport = async (report: CitizenReport) => {
     setCitizenReports((prev) => [report, ...prev]);
     showToast('Laporan warga Anda telah diterima oleh redaksi!');
+    try {
+      await setDoc(doc(db, 'citizenReports', report.id), report);
+    } catch (e) {
+      console.warn('Firestore report write notice:', e);
+    }
   };
 
   // Admin Actions
-  const handleAddArticle = (newArt: Article) => {
+  const handleAddArticle = async (newArt: Article) => {
     setArticles((prev) => [newArt, ...prev]);
     showToast('Berita baru berhasil diterbitkan!');
+    try {
+      await setDoc(doc(db, 'articles', newArt.id), newArt);
+    } catch (e) {
+      console.warn('Firestore article write notice:', e);
+    }
   };
 
-  const handleUpdateArticle = (updatedArt: Article) => {
+  const handleUpdateArticle = async (updatedArt: Article) => {
     setArticles((prev) => prev.map((a) => (a.id === updatedArt.id ? updatedArt : a)));
     showToast('Berita berhasil diperbarui!');
+    try {
+      await setDoc(doc(db, 'articles', updatedArt.id), updatedArt);
+    } catch (e) {
+      console.warn('Firestore article update notice:', e);
+    }
   };
 
-  const handleDeleteArticle = (articleId: string) => {
+  const handleDeleteArticle = async (articleId: string) => {
     setArticles((prev) => prev.filter((a) => a.id !== articleId));
     showToast('Berita berhasil dihapus.');
+    try {
+      await deleteDoc(doc(db, 'articles', articleId));
+    } catch (e) {
+      console.warn('Firestore article delete notice:', e);
+    }
   };
 
   const handleUpdateAdSlot = (updatedSlot: AdSlot) => {
@@ -659,6 +730,17 @@ export default function App() {
           setViewMode('admin');
         }}
         onOpenEditorialInfo={(tab) => setEditorialModalTab(tab)}
+        onScrollToVideo={() => {
+          if (activeCategory !== 'Semua') {
+            setActiveCategory('Semua');
+          }
+          setTimeout(() => {
+            const el = document.getElementById('warta-video-section');
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
+        }}
         darkMode={darkMode}
         customLogoUrl={customLogoUrl}
       />
@@ -738,6 +820,14 @@ export default function App() {
           window.location.hash = 'admin';
           setViewMode('admin');
         }}
+        darkMode={darkMode}
+      />
+
+      {/* WhatsApp Smart Share Modal (Gambar + Teks + Link) */}
+      <WhatsAppShareModal
+        article={shareModalArticle}
+        isOpen={shareModalArticle !== null}
+        onClose={() => setShareModalArticle(null)}
         darkMode={darkMode}
       />
     </div>

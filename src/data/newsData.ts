@@ -6,7 +6,47 @@ export type NewsCategory =
   | 'Olahraga' 
   | 'Legalitas' 
   | 'Ekonomi'
-  | 'Lapor Warga';
+  | 'Lapor Warga'
+  | string;
+
+export interface CategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+  isSystem?: boolean;
+}
+
+export interface PortalThemeConfig {
+  presetTheme: 'nusantara_navy' | 'emerald_garuda' | 'maroon_merdeka' | 'deep_sapphire' | 'classic_press';
+  accentColor: string;
+  layoutDensity: 'comfortable' | 'compact' | 'spacious';
+  templateStyle: 'modern_portal' | 'metro_editorial' | 'clean_magazine';
+  primaryFont: 'sans' | 'serif';
+}
+
+export interface AntiBuzzerConfig {
+  isEnabled: boolean;
+  sensitivity: 'low' | 'medium' | 'strict';
+  blockedKeywords: string[];
+  blockLinksInComments: boolean;
+  requireHumanVerification: boolean;
+  rateLimitPerMinute: number;
+  autoShadowBan: boolean;
+  interceptedCount: number;
+  blockedPhrasesCount: number;
+}
+
+export interface BuzzerInterceptionLog {
+  id: string;
+  timestamp: string;
+  authorName: string;
+  snippet: string;
+  reason: string;
+  status: 'blocked' | 'flagged';
+  articleTitle?: string;
+}
 
 export interface CommentItem {
   id: string;
@@ -71,7 +111,7 @@ export interface PortalBrandConfig {
 }
 
 export const DEFAULT_LAPOR_WARGA_CONFIG: LaporWargaConfig = {
-  hotlineWA: '0812-3888-7200',
+  hotlineWA: '0895626941900',
   emailAdvokasi: 'lapor@arunnews.id',
   operatingHours: '24 Jam Nonstop Siaga Publik',
   autoApprove: false,
@@ -90,9 +130,86 @@ export const DEFAULT_PORTAL_CONFIG: PortalBrandConfig = {
   portalName: 'ARUN NEWS',
   portalSlogan: 'Jembatan Media Nusantara',
   editorialEmail: 'redaksi@arunnews.id',
-  editorialPhone: '(021) 388-7200',
-  address: 'Gedung Graha Media Nusantara Lt. 4, Jl. M.H. Thamrin No. 88, Jakarta Pusat 10350'
+  editorialPhone: '0895626941900',
+  address: 'Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia'
 };
+
+export const DEFAULT_CATEGORIES: CategoryItem[] = [
+  { id: 'cat-politik', name: 'Politik', slug: 'politik', color: '#3b82f6', isSystem: true, description: 'Dinamika parlemen, kebijakan pemerintah, dan peta politik Nusantara' },
+  { id: 'cat-daerah', name: 'Daerah', slug: 'daerah', color: '#10b981', isSystem: true, description: 'Kabar dan denyut nadi pembangunan dari seluruh pelosok Nusantara' },
+  { id: 'cat-kriminal', name: 'Kriminal', slug: 'kriminal', color: '#ef4444', isSystem: true, description: 'Laporan penegakan hukum dan investigasi kasus' },
+  { id: 'cat-olahraga', name: 'Olahraga', slug: 'olahraga', color: '#f59e0b', isSystem: true, description: 'Ulasan pertandingan dan prestasi atlet nasional' },
+  { id: 'cat-legalitas', name: 'Legalitas', slug: 'legalitas', color: '#8b5cf6', isSystem: true, description: 'Profil keabsahan hukum pers dan sertifikasi Dewan Pers' },
+  { id: 'cat-ekonomi', name: 'Ekonomi', slug: 'ekonomi', color: '#06b6d4', isSystem: true, description: 'Analisis pasar modal, perbankan, dan investasi UMKM' },
+  { id: 'cat-lapor', name: 'Lapor Warga', slug: 'lapor-warga', color: '#f97316', isSystem: true, description: 'Saluran aduan dan advokasi fasilitas publik masyarakat' },
+  { id: 'cat-lain', name: 'Lain-lain', slug: 'lain-lain', color: '#64748b', isSystem: true, description: 'Ragam informasi gaya hidup, sains, dan teknologi' },
+];
+
+export const DEFAULT_THEME_CONFIG: PortalThemeConfig = {
+  presetTheme: 'nusantara_navy',
+  accentColor: '#fbbf24',
+  layoutDensity: 'comfortable',
+  templateStyle: 'modern_portal',
+  primaryFont: 'sans'
+};
+
+export const DEFAULT_ANTI_BUZZER_CONFIG: AntiBuzzerConfig = {
+  isEnabled: true,
+  sensitivity: 'medium',
+  blockedKeywords: [
+    'buzzer',
+    'buzzerRp',
+    'cebong',
+    'kampret',
+    'kadrun',
+    'slot gacor',
+    'judi online',
+    'judol',
+    'togel',
+    'pinjol ilegal',
+    'dana kaget palsu',
+    'bot spam',
+    'serang akun',
+    'transfer pulsa gratis',
+    'klik link bio'
+  ],
+  blockLinksInComments: true,
+  requireHumanVerification: true,
+  rateLimitPerMinute: 3,
+  autoShadowBan: true,
+  interceptedCount: 42,
+  blockedPhrasesCount: 15
+};
+
+export const INITIAL_BUZZER_LOGS: BuzzerInterceptionLog[] = [
+  {
+    id: 'log-1',
+    timestamp: '21 Okt 2026, 14:12 WIB',
+    authorName: 'Akun_Bot_992',
+    snippet: 'Daftar sekarang di slot gacor link aman winrate 99% deposit 10rb...',
+    reason: 'Promosi Judi Online & Link Spam Terlarang',
+    status: 'blocked',
+    articleTitle: 'IHSG Menguat Ditopang Pertumbuhan Manufaktur Hijau'
+  },
+  {
+    id: 'log-2',
+    timestamp: '21 Okt 2026, 13:45 WIB',
+    authorName: 'Anonim_Siber',
+    snippet: 'Dasar buzzer bayaran rezim antek asing hoax semua...',
+    reason: 'Ujaran Provokatif & Kata Kunci Blacklist Buzzer',
+    status: 'blocked',
+    articleTitle: 'DPR Sahkan RUU Komprehensif Tata Kelola Energi Terbarukan'
+  },
+  {
+    id: 'log-3',
+    timestamp: '21 Okt 2026, 11:20 WIB',
+    authorName: 'SpamUser77',
+    snippet: 'Klaim saldo dana kaget klik link bit.ly/dana-gratis sekarang...',
+    reason: 'Phishing / Link Spam Berbahaya',
+    status: 'blocked',
+    articleTitle: 'Warga Mengeluhkan Lubang Menganga di Jalur Utama Pasar Minggu'
+  }
+];
 
 export const ARUN_LEGAL_DATA = {
   companyName: 'PT ARUN MEDIA NUSANTARA',
@@ -108,7 +225,7 @@ export const ARUN_LEGAL_DATA = {
   pemimpinRedaksi: 'Dr. H. Bagus Setyawan, M.I.Kom',
   redakturEksekutif: 'Rian Hidayat, M.Si',
   kuasaHukum: 'Adv. Hendra Wijaya, S.H., M.H. & Partners (Advokat & Konsultan Hukum Media Siber)',
-  alamatKantor: 'Gedung Graha Media Nusantara Lt. 4, Jl. M.H. Thamrin No. 88, Jakarta Pusat 10350',
+  alamatKantor: 'Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia',
   notaris: 'Dra. Hj. Nurjanah Sasmita, S.H., M.Kn (Akta No. 24 Tanggal 15 Januari 2024)',
   merekDaftarHki: 'Kemenkumham Ditjen HKI Sertifikat Merek Kelas 38 & 41 No. IDM000984123',
   pedomanMediaSiber: 'Kepatuhan penuh pada Standar Peraturan Dewan Pers No. 1/Peraturan-DP/III/2012'

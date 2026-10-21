@@ -20,10 +20,27 @@ import {
   Play,
   Film,
   ShieldAlert,
+  ShieldCheck,
+  FolderPlus,
+  Palette,
   Sliders,
   RotateCcw
 } from 'lucide-react';
-import { Article, AdSlot, CitizenReport, CoffeeTip, NewsCategory, LaporWargaConfig } from '../data/newsData';
+import {
+  Article,
+  AdSlot,
+  CitizenReport,
+  CoffeeTip,
+  NewsCategory,
+  LaporWargaConfig,
+  CategoryItem,
+  PortalThemeConfig,
+  AntiBuzzerConfig,
+  BuzzerInterceptionLog
+} from '../data/newsData';
+import CategoryManagementTab from './admin/CategoryManagementTab';
+import ThemeAppearanceTab from './admin/ThemeAppearanceTab';
+import AntiBuzzerTab from './admin/AntiBuzzerTab';
 
 interface AdminPanelProps {
   articles: Article[];
@@ -42,6 +59,15 @@ interface AdminPanelProps {
   onUpdateCustomLogo: (logoUrl: string | undefined) => void;
   laporConfig: LaporWargaConfig;
   onUpdateLaporConfig: (config: LaporWargaConfig) => void;
+  categories: CategoryItem[];
+  onAddCategory: (category: CategoryItem) => void;
+  onDeleteCategory: (categoryId: string) => void;
+  themeConfig: PortalThemeConfig;
+  onUpdateThemeConfig: (config: PortalThemeConfig) => void;
+  antiBuzzerConfig: AntiBuzzerConfig;
+  onUpdateAntiBuzzerConfig: (config: AntiBuzzerConfig) => void;
+  buzzerLogs: BuzzerInterceptionLog[];
+  onClearBuzzerLogs: () => void;
 }
 
 export default function AdminPanel({
@@ -60,9 +86,29 @@ export default function AdminPanel({
   customLogoUrl,
   onUpdateCustomLogo,
   laporConfig,
-  onUpdateLaporConfig
+  onUpdateLaporConfig,
+  categories,
+  onAddCategory,
+  onDeleteCategory,
+  themeConfig,
+  onUpdateThemeConfig,
+  antiBuzzerConfig,
+  onUpdateAntiBuzzerConfig,
+  buzzerLogs,
+  onClearBuzzerLogs
 }: AdminPanelProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'articles' | 'reports' | 'lapor_settings' | 'ads' | 'coffee' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    | 'overview'
+    | 'articles'
+    | 'categories'
+    | 'appearance'
+    | 'antibuzzer'
+    | 'reports'
+    | 'lapor_settings'
+    | 'ads'
+    | 'coffee'
+    | 'settings'
+  >('overview');
 
   // Article Modal Form State (Add / Edit)
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
@@ -89,7 +135,8 @@ export default function AdminPanel({
   const [portalName, setPortalName] = useState('ARUN NEWS');
   const [portalSlogan, setPortalSlogan] = useState('Jembatan Media Nusantara');
   const [editorialEmail, setEditorialEmail] = useState('redaksi@arunnews.id');
-  const [editorialPhone, setEditorialPhone] = useState('(021) 388-7200');
+  const [editorialPhone, setEditorialPhone] = useState('0895626941900');
+  const [editorialAddress, setEditorialAddress] = useState('Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia');
   const [logoFileName, setLogoFileName] = useState('');
   const [settingsSaved, setSettingsSaved] = useState(false);
 
@@ -436,6 +483,61 @@ export default function AdminPanel({
                 </span>
               </button>
 
+              {/* TAB: MANAJEMEN & PENAMBAHAN KATEGORI */}
+              <button
+                onClick={() => setActiveTab('categories')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                  activeTab === 'categories'
+                    ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                    : 'text-blue-100 hover:bg-blue-900 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <FolderPlus className="w-4 h-4 text-amber-400" />
+                  <span>Kategori Berita</span>
+                </div>
+                <span className="text-[10px] bg-blue-950 text-amber-400 border border-amber-400/30 px-1.5 py-0.5 rounded font-bold">
+                  {categories.length}
+                </span>
+              </button>
+
+              {/* TAB: PENGATURAN WARNA & TEMPLATE DESAIN */}
+              <button
+                onClick={() => setActiveTab('appearance')}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                  activeTab === 'appearance'
+                    ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                    : 'text-blue-100 hover:bg-blue-900 hover:text-white'
+                }`}
+              >
+                <Palette className="w-4 h-4 text-amber-400" />
+                <span>Warna & Template Desain</span>
+              </button>
+
+              {/* TAB: PERISAI ANTI BUZZER */}
+              <button
+                onClick={() => setActiveTab('antibuzzer')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                  activeTab === 'antibuzzer'
+                    ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                    : 'text-blue-100 hover:bg-blue-900 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+                  <span>Perisai Anti Buzzer</span>
+                </div>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded font-black ${
+                    antiBuzzerConfig.isEnabled
+                      ? 'bg-emerald-500 text-slate-950'
+                      : 'bg-rose-600 text-white'
+                  }`}
+                >
+                  {antiBuzzerConfig.isEnabled ? 'Aktif' : 'Off'}
+                </span>
+              </button>
+
               <button
                 onClick={() => setActiveTab('reports')}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
@@ -685,6 +787,34 @@ export default function AdminPanel({
                 </table>
               </div>
             </div>
+          )}
+
+          {/* TAB: MANAJEMEN & PENAMBAHAN KATEGORI */}
+          {activeTab === 'categories' && (
+            <CategoryManagementTab
+              categories={categories}
+              onAddCategory={onAddCategory}
+              onDeleteCategory={onDeleteCategory}
+              articles={articles}
+            />
+          )}
+
+          {/* TAB: PENGATURAN WARNA & TEMPLATE DESAIN */}
+          {activeTab === 'appearance' && (
+            <ThemeAppearanceTab
+              themeConfig={themeConfig}
+              onUpdateThemeConfig={onUpdateThemeConfig}
+            />
+          )}
+
+          {/* TAB: PERISAI ANTI BUZZER */}
+          {activeTab === 'antibuzzer' && (
+            <AntiBuzzerTab
+              antiBuzzerConfig={antiBuzzerConfig}
+              onUpdateAntiBuzzerConfig={onUpdateAntiBuzzerConfig}
+              buzzerLogs={buzzerLogs}
+              onClearBuzzerLogs={onClearBuzzerLogs}
+            />
           )}
 
           {/* TAB 3: CITIZEN REPORTS MODERATION */}
@@ -1367,6 +1497,18 @@ export default function AdminPanel({
                   </div>
                 </div>
 
+                <div>
+                  <label className="block font-bold text-white mb-1">
+                    Alamat Kantor Redaksi & Usaha:
+                  </label>
+                  <input
+                    type="text"
+                    value={editorialAddress}
+                    onChange={(e) => setEditorialAddress(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-blue-700 bg-[#071933] text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
+                  />
+                </div>
+
                 <button
                   type="submit"
                   className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
@@ -1424,14 +1566,11 @@ export default function AdminPanel({
                     onChange={(e) => setFormCategory(e.target.value as NewsCategory)}
                     className="w-full px-3 py-2 rounded-lg border border-blue-700 bg-[#071933] text-white font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
                   >
-                    <option value="Politik" className="bg-[#071933] text-white">Politik</option>
-                    <option value="Daerah" className="bg-[#071933] text-white">Daerah</option>
-                    <option value="Kriminal" className="bg-[#071933] text-white">Kriminal</option>
-                    <option value="Lain-lain" className="bg-[#071933] text-white">Lain-lain</option>
-                    <option value="Olahraga" className="bg-[#071933] text-white">Olahraga</option>
-                    <option value="Legalitas" className="bg-[#071933] text-white">Legalitas</option>
-                    <option value="Ekonomi" className="bg-[#071933] text-white">Ekonomi</option>
-                    <option value="Lapor Warga" className="bg-[#071933] text-white">Lapor Warga</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.name} className="bg-[#071933] text-white">
+                        {cat.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

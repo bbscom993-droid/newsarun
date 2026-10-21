@@ -12,6 +12,7 @@ interface HeaderProps {
   darkMode: boolean;
   onToggleDarkMode: () => void;
   customLogoUrl?: string;
+  categoriesList?: string[];
 }
 
 export const CATEGORIES: (string | NewsCategory)[] = [
@@ -34,9 +35,13 @@ export default function Header({
   onOpenLaporWarga,
   darkMode,
   onToggleDarkMode,
-  customLogoUrl
+  customLogoUrl,
+  categoriesList
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navCategories = categoriesList && categoriesList.length > 0
+    ? ['Semua', ...categoriesList.filter((c) => c !== 'Semua')]
+    : CATEGORIES;
 
   return (
     <header
@@ -85,7 +90,7 @@ export default function Header({
 
           {/* Zone 2: Navigation Links for requested categories */}
           <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 overflow-x-auto no-scrollbar">
-            {CATEGORIES.map((cat) => {
+            {navCategories.map((cat) => {
               const isActive = activeCategory === cat;
               return (
                 <button
@@ -170,7 +175,7 @@ export default function Header({
         }`}
       >
         <div className="flex items-center gap-1.5 min-w-max">
-          {CATEGORIES.map((cat) => {
+          {navCategories.map((cat) => {
             const isActive = activeCategory === cat;
             return (
               <button
@@ -215,7 +220,7 @@ export default function Header({
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {CATEGORIES.map((cat) => (
+            {navCategories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => {

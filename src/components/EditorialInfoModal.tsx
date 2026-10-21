@@ -302,6 +302,27 @@ export default function EditorialInfoModal({
                 </div>
               </div>
 
+              {/* Kantor Redaksi & Usaha */}
+              <div className="p-4 rounded-xl bg-blue-950/80 border border-blue-700/80 space-y-2 text-xs">
+                <div className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-amber-400" />
+                  <span>Alamat Kantor Redaksi & Tata Usaha</span>
+                </div>
+                <p className="text-white font-semibold text-sm">
+                  Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia
+                </p>
+                <div className="flex flex-wrap items-center gap-4 text-blue-200 text-xs pt-1">
+                  <div className="flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Telepon: (021) 388-7200 / 388-7201</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Email: redaksi@arunnews.id / pengaduan@arunnews.id</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Notice to Public */}
               <div className="p-3.5 rounded-xl bg-amber-400/10 border border-amber-400/40 text-xs text-amber-200">
                 <strong>Catatan Resmi Dewan Redaksi:</strong> Seluruh wartawan dan koresponden Arun News dibekali Surat Tugas resmi dan Kartu Tanda Anggota (KTA) bertanda tangan Pemimpin Redaksi serta tercantum dalam Box Redaksi. Jurnalis Arun News DILARANG KERAS menerima imbalan, uang suap, atau gratifikasi dalam bentuk apa pun terkait pemberitaan.

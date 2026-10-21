@@ -69,7 +69,7 @@ export default function VideoNewsSection({
   };
 
   return (
-    <section className="mb-10 w-full">
+    <section id="warta-video-section" className="mb-10 w-full scroll-mt-20">
       <div
         className={`p-5 sm:p-6 rounded-2xl border transition-colors shadow-xl ${
           darkMode
