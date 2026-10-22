@@ -1,6 +1,19 @@
 import { useState } from 'react';
-import { Clock, Eye, Share2, Bookmark, Sparkles, ChevronRight, Radio, Coffee } from 'lucide-react';
-import { Article } from '../data/newsData';
+import {
+  Clock,
+  Eye,
+  Share2,
+  Bookmark,
+  Sparkles,
+  ChevronRight,
+  Radio,
+  Coffee,
+  Megaphone,
+  ExternalLink,
+  MessageCircle,
+  X
+} from 'lucide-react';
+import { Article, AdSlot } from '../data/newsData';
 
 interface HeroHeadlinesProps {
   leadArticle: Article;
@@ -11,6 +24,11 @@ interface HeroHeadlinesProps {
   onShare: (article: Article) => void;
   onOpenSawerKopi: (articleTitle?: string) => void;
   darkMode: boolean;
+  adSlot?: AdSlot;
+  onSubscribeAdSlot?: (
+    slotId: string,
+    data: { brandName: string; bannerUrl: string; targetUrl: string; durationDays: number }
+  ) => void;
 }
 
 export default function HeroHeadlines({
@@ -21,9 +39,37 @@ export default function HeroHeadlines({
   isBookmarked,
   onShare,
   onOpenSawerKopi,
-  darkMode
+  darkMode,
+  adSlot,
+  onSubscribeAdSlot
 }: HeroHeadlinesProps) {
   const [showAiSummary, setShowAiSummary] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [brandName, setBrandName] = useState('');
+  const [bannerUrl, setBannerUrl] = useState('');
+  const [targetUrl, setTargetUrl] = useState('');
+
+  const hotlinePhone = '0895626941900';
+  const waAdUrl = `https://wa.me/62${hotlinePhone.replace(/^0/, '')}?text=${encodeURIComponent(
+    'Halo Marketing Redaksi Arun News, saya ingin memasang iklan sidebar di bawah Live Report Agenda Nasional (300 x 250 px)'
+  )}`;
+
+  const handleSubmitBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!brandName.trim() || !bannerUrl.trim()) return;
+
+    if (adSlot && onSubscribeAdSlot) {
+      onSubscribeAdSlot(adSlot.id, {
+        brandName,
+        bannerUrl,
+        targetUrl: targetUrl || '#',
+        durationDays: 30
+      });
+    }
+    setIsBookingOpen(false);
+  };
+
+  const isActiveSponsor = !!adSlot?.currentSponsor?.bannerUrl;
 
   return (
     <section className="mb-8">
@@ -98,51 +144,42 @@ export default function HeroHeadlines({
                 {leadArticle.summary}
               </p>
 
-              {/* Key points expander */}
+              {/* Points Card */}
               {leadArticle.keyPoints && leadArticle.keyPoints.length > 0 && (
-                <div className="mb-4">
-                  <button
-                    onClick={() => setShowAiSummary(!showAiSummary)}
-                    className="flex items-center gap-1.5 text-xs font-black text-slate-950 bg-amber-400 hover:bg-amber-300 px-3 py-1.5 rounded-lg transition-colors shadow-2xs"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
-                    <span>{showAiSummary ? 'Sembunyikan Poin Kunci' : 'Ringkasan Kilat Berita (3 Poin)'}</span>
-                  </button>
-
-                  {showAiSummary && (
-                    <div className="mt-2.5 p-3.5 rounded-xl bg-blue-950/80 border border-blue-700/80 text-xs text-blue-100 space-y-1.5">
-                      <div className="font-black text-amber-400 uppercase tracking-wider text-[11px]">
-                        Intisari Editorial:
-                      </div>
-                      <ul className="list-disc list-inside space-y-1 font-medium text-slate-200">
-                        {leadArticle.keyPoints.map((pt, idx) => (
-                          <li key={idx} className="leading-snug">{pt}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                <div className="mb-5 p-3.5 rounded-xl bg-blue-950/70 border border-blue-800/80">
+                  <div className="text-[11px] font-black uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Poin Kunci Redaksi</span>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-blue-100 font-medium">
+                    {leadArticle.keyPoints.map((point, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
 
-            {/* Bottom Actions Bar */}
-            <div className="pt-4 border-t border-blue-800/80 flex items-center justify-between">
+            {/* Read Button & Action Utilities */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-blue-800/60">
               <button
                 onClick={() => onSelectArticle(leadArticle)}
-                className="flex items-center gap-1 text-xs font-black text-amber-400 hover:text-amber-300 transition-colors group"
+                className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm tracking-wide transition-all shadow-md flex items-center gap-1.5"
               >
                 <span>Baca Selengkapnya</span>
-                <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                <ChevronRight className="w-4 h-4" />
               </button>
 
               <div className="flex items-center gap-2">
-                {/* Sawer Kopi Trigger */}
                 <button
-                  onClick={() => onOpenSawerKopi(leadArticle.title)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-colors shadow-2xs"
-                  title="Traktir Kopi Redaksi"
+                  onClick={() => onOpenSawerKopi?.(leadArticle.title)}
+                  className="px-3 py-2 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/50 text-xs font-bold transition-colors flex items-center gap-1.5"
+                  title="Traktir Kopi Wartawan"
                 >
-                  <Coffee className="w-3.5 h-3.5 fill-slate-950" />
+                  <Coffee className="w-3.5 h-3.5 text-amber-400" />
                   <span className="hidden sm:inline">Sawer Kopi</span>
                 </button>
 
@@ -172,7 +209,7 @@ export default function HeroHeadlines({
           </div>
         </div>
 
-        {/* Tier 2 & 3: Secondary Features + Live Updates (5 cols) */}
+        {/* Tier 2 & 3: Secondary Features + Live Updates + SIDEBAR AD (5 cols) */}
         <div className="lg:col-span-5 flex flex-col gap-4">
           {secondaryArticles[0] && (
             <div
@@ -248,7 +285,7 @@ export default function HeroHeadlines({
             </div>
           )}
 
-          {/* Fokus Terkini / Live Ticker */}
+          {/* Fokus Terkini / Live Ticker (LIVE REPORT Agenda Nasional) */}
           <div
             className={`p-4 rounded-2xl border ${
               darkMode
@@ -289,8 +326,175 @@ export default function HeroHeadlines({
               ))}
             </div>
           </div>
+
+          {/* DIBAWAH LIVE REPORT AGENDA NASIONAL: RUANG IKLAN SIDEBAR SESUAI UKURAN */}
+          <div className="w-full">
+            {/* Header Badge Ukuran Iklan */}
+            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-amber-400 mb-1.5 px-1">
+              <span className="flex items-center gap-1.5">
+                <Megaphone className="w-3.5 h-3.5 text-amber-400" />
+                <span>Ruang Iklan Sidebar (300 × 250 px / MREC)</span>
+              </span>
+              <span className="text-blue-300 font-mono">IAB Standard</span>
+            </div>
+
+            {/* Container Iklan Sidebar Presisi */}
+            <div
+              className={`w-full min-h-[230px] rounded-2xl overflow-hidden relative border shadow-2xl flex flex-col justify-between transition-all ${
+                darkMode
+                  ? 'bg-[#081b33] border-blue-900/80 hover:border-blue-700'
+                  : 'bg-[#0a2347] border-blue-700/80 shadow-2xl hover:border-amber-400/80 text-white'
+              }`}
+            >
+              {isActiveSponsor && adSlot?.currentSponsor ? (
+                // Active Partner Sponsor Banner
+                <a
+                  href={adSlot.currentSponsor.targetUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full h-full min-h-[230px] relative group block"
+                >
+                  <img
+                    src={adSlot.currentSponsor.bannerUrl}
+                    alt={adSlot.currentSponsor.brandName || 'Iklan Mitra Arun News'}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-90 group-hover:opacity-75 transition-opacity" />
+                  <div className="absolute bottom-3 inset-x-3 flex items-center justify-between text-white">
+                    <div>
+                      <span className="text-[10px] uppercase font-black tracking-wider text-amber-300 block">
+                        Mitra Resmi Arun News
+                      </span>
+                      <span className="text-xs sm:text-sm font-black truncate max-w-[200px] block">
+                        {adSlot.currentSponsor.brandName}
+                      </span>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 text-xs font-black flex items-center gap-1 shadow-md">
+                      <span>Kunjungi</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </span>
+                  </div>
+                </a>
+              ) : (
+                // Available / Booking Call to Action
+                <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between text-white bg-gradient-to-br from-[#0c264d] via-[#0f2e5a] to-[#071933]">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="px-2 py-0.5 rounded bg-blue-950 text-amber-300 text-[10px] font-black uppercase border border-amber-400/40">
+                        Slot Sidebar Tersedia
+                      </span>
+                      <span className="text-[10px] font-bold text-blue-300">
+                        300 × 250 px
+                      </span>
+                    </div>
+
+                    <h4 className="text-sm sm:text-base font-black text-white leading-tight mb-1.5">
+                      Ruang Iklan Sidebar Tepat di Bawah Live Report
+                    </h4>
+
+                    <p className="text-xs text-blue-200 leading-relaxed">
+                      Jangkau <strong>250.000+ pembaca</strong> setia dan pengambil keputusan saat mereka memantau pembaruan agenda nasional setiap hari.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 pt-3 border-t border-blue-800/80 mt-2">
+                    <a
+                      href={waAdUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>Hubungi Marketing (0895626941900)</span>
+                    </a>
+
+                    <button
+                      onClick={() => setIsBookingOpen(true)}
+                      className="w-full py-1.5 px-3 rounded-xl bg-blue-950 hover:bg-blue-900 text-amber-300 border border-amber-400/50 font-bold text-[11px] transition-colors"
+                    >
+                      Pasang Banner Cepat di Sini
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Quick Advertiser Booking Modal */}
+      {isBookingOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[#0a2347] border border-amber-400/60 rounded-2xl p-6 text-white shadow-2xl">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-black uppercase text-amber-400 flex items-center gap-2">
+                <Megaphone className="w-5 h-5 text-amber-400" />
+                <span>Pasang Iklan Sidebar 300x250</span>
+              </h3>
+              <button onClick={() => setIsBookingOpen(false)} className="text-blue-300 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-blue-200 mb-4 leading-relaxed">
+              Tempatkan materi promosi brand atau instansi Anda tepat di bawah kotak Live Report Agenda Nasional di halaman utama Arun News.
+            </p>
+
+            <form onSubmit={handleSubmitBooking} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold mb-1 text-blue-200">Nama Perusahaan / Brand:</label>
+                <input
+                  type="text"
+                  required
+                  value={brandName}
+                  onChange={(e) => setBrandName(e.target.value)}
+                  placeholder="Contoh: Bank BNI / Astra Agro / UMKM Unggulan"
+                  className="w-full px-3 py-2 rounded-lg bg-blue-950 border border-blue-700 text-white placeholder-blue-400 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-1 text-blue-200">URL Gambar Banner (300 x 250 px):</label>
+                <input
+                  type="url"
+                  required
+                  value={bannerUrl}
+                  onChange={(e) => setBannerUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/... atau URL materi"
+                  className="w-full px-3 py-2 rounded-lg bg-blue-950 border border-blue-700 text-white placeholder-blue-400 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-1 text-blue-200">URL Tujuan Klik (Website / WhatsApp):</label>
+                <input
+                  type="url"
+                  value={targetUrl}
+                  onChange={(e) => setTargetUrl(e.target.value)}
+                  placeholder="https://perusahaan-anda.com/promo"
+                  className="w-full px-3 py-2 rounded-lg bg-blue-950 border border-blue-700 text-white placeholder-blue-400 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsBookingOpen(false)}
+                  className="px-4 py-2 rounded-lg bg-blue-900 text-blue-200 font-bold hover:bg-blue-800 transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 font-black hover:bg-amber-300 transition-colors shadow-md"
+                >
+                  Tayangkan Iklan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

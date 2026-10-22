@@ -734,6 +734,8 @@ export default function App() {
               onShare={handleShare}
               onOpenSawerKopi={handleOpenSawerKopi}
               darkMode={darkMode}
+              adSlot={adSlots.find((s) => s.position === 'sidebar_rectangle') || adSlots[1]}
+              onSubscribeAdSlot={handleSubscribeAdSlot}
             />
 
             {/* Prakiraan Cuaca & Jadwal Transportasi Nusantara */}

@@ -6,7 +6,6 @@ import {
   Users,
   ShieldCheck,
   Megaphone,
-  Settings,
   FileText,
   Scale,
   Briefcase,
@@ -22,7 +21,7 @@ interface FooterProps {
   onSelectCategory: (category: string) => void;
   onOpenSawerKopi: () => void;
   onOpenLaporWarga: () => void;
-  onOpenAdmin: () => void;
+  onOpenAdmin?: () => void;
   onOpenEditorialInfo: (tab: EditorialModalTab) => void;
   onScrollToVideo?: () => void;
   darkMode: boolean;
@@ -87,7 +86,7 @@ export default function Footer({
               Arun News adalah jembatan media nusantara independen yang menyajikan informasi terkini secara cepat, akurat, dan tepercaya setiap hari dari Sabang hingga Merauke.
             </p>
 
-            {/* Quick Action Buttons in Footer: Sawer Kopi, Video Berita & Pengaturan Admin */}
+            {/* Quick Action Buttons in Footer: Sawer Kopi & Video Berita */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <button
                 onClick={onOpenSawerKopi}
@@ -106,14 +105,6 @@ export default function Footer({
                   <span>Warta Video</span>
                 </button>
               )}
-
-              <button
-                onClick={onOpenAdmin}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-900/90 hover:bg-blue-800 text-amber-300 border border-amber-400/40 font-bold text-xs transition-colors shadow-xs"
-              >
-                <Settings className="w-3.5 h-3.5" />
-                <span>Pengaturan Admin</span>
-              </button>
             </div>
 
             {/* Hotline & Kontak Redaksi Card */}
@@ -168,14 +159,6 @@ export default function Footer({
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 group-hover:bg-amber-400 transition-colors" />
                 <span>Susunan Pengelola & Box Redaksi</span>
-              </button>
-
-              <button
-                onClick={onOpenAdmin}
-                className="text-left text-blue-200 hover:text-amber-300 transition-colors py-1 flex items-center gap-2 group font-semibold text-amber-300"
-              >
-                <Settings className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-45 transition-transform" />
-                <span>Pengaturan Admin Portal</span>
               </button>
 
               {onScrollToVideo && (
