@@ -77,12 +77,12 @@ export default function Footer({
             {/* Kantor Redaksi info */}
             <div className="pt-2 text-[11px] text-blue-300 space-y-1">
               <div className="flex items-start gap-1.5">
-                <MapPin className="w-3 h-3 text-amber-400 mt-0.5 shrink-0" />
-                <span>Gedung Graha Nusantara Lt. 5, Jl. Medan Merdeka Barat No. 12, Gambir, Jakarta Pusat 10110</span>
+                <MapPin className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+                <span><strong>Kantor Redaksi:</strong> Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Mail className="w-3 h-3 text-amber-400 shrink-0" />
-                <span>redaksi@arunnews.id · (021) 388-7200</span>
+                <span>redaksi@arunnews.id · (021) 788-3400</span>
               </div>
             </div>
           </div>
@@ -218,8 +218,20 @@ export default function Footer({
         </div>
 
         {/* Footer Bottom Row */}
-        <div className="py-6 flex flex-wrap items-center justify-between gap-4 text-xs text-blue-200">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="py-6 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-blue-200">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-2">
+            <button onClick={() => onOpenEditorialInfo('box_redaksi')} className="hover:text-amber-300 transition-colors font-semibold">
+              Tentang Kami & Partisipasi
+            </button>
+            <span aria-hidden="true" className="text-blue-500">·</span>
+            <button onClick={onOpenLaporWarga} className="hover:text-amber-300 transition-colors font-semibold text-amber-300">
+              Lapor Warga
+            </button>
+            <span aria-hidden="true" className="text-blue-500">·</span>
+            <button onClick={() => onOpenEditorialInfo('box_redaksi')} className="hover:text-amber-300 transition-colors">
+              Susunan Pengelola & Box Redaksi
+            </button>
+            <span aria-hidden="true" className="text-blue-500">·</span>
             <button onClick={() => onOpenEditorialInfo('pedoman_siber')} className="hover:text-amber-300 transition-colors">
               Pedoman Media Siber
             </button>
@@ -228,24 +240,32 @@ export default function Footer({
               Kode Etik Jurnalistik
             </button>
             <span aria-hidden="true" className="text-blue-500">·</span>
-            <button onClick={() => onOpenEditorialInfo('panduan_warga')} className="hover:text-amber-300 transition-colors">
+            <button onClick={() => onOpenEditorialInfo('privasi')} className="hover:text-amber-300 transition-colors">
+              Kebijakan Privasi
+            </button>
+            <span aria-hidden="true" className="text-blue-500">·</span>
+            <button onClick={() => onOpenEditorialInfo('panduan_warga')} className="hover:text-amber-300 transition-colors text-amber-200">
               Panduan Jurnalisme Warga
             </button>
             <span aria-hidden="true" className="text-blue-500">·</span>
-            <button onClick={() => onOpenEditorialInfo('privasi')} className="hover:text-amber-300 transition-colors">
-              Kebijakan Privasi
+            <button onClick={() => onOpenEditorialInfo('syarat')} className="hover:text-amber-300 transition-colors">
+              Syarat & Ketentuan
             </button>
             <span aria-hidden="true" className="text-blue-500">·</span>
             <button onClick={() => onOpenEditorialInfo('disclaimer')} className="hover:text-amber-300 transition-colors">
               Disclaimer
             </button>
             <span aria-hidden="true" className="text-blue-500">·</span>
-            <button onClick={() => onOpenEditorialInfo('iklan')} className="hover:text-amber-300 transition-colors">
+            <button onClick={() => onOpenEditorialInfo('iklan')} className="hover:text-amber-300 transition-colors font-bold text-amber-400">
               Pemasangan Iklan & Kemitraan
+            </button>
+            <span aria-hidden="true" className="text-blue-500">·</span>
+            <button onClick={onOpenAdmin} className="hover:text-amber-300 transition-colors text-blue-300">
+              Pengaturan Admin
             </button>
           </div>
 
-          <div className="flex items-center gap-2 text-blue-300 font-bold">
+          <div className="flex items-center gap-2 text-blue-300 font-bold shrink-0">
             <span>ARUN NEWS · Jembatan Media Nusantara</span>
           </div>
         </div>

@@ -217,6 +217,12 @@ export default function EditorialInfoModal({
                   <p className="text-xs text-blue-200 mt-0.5">
                     <strong>PT ARUN MEDIA NUSANTARA</strong> · SK Menkumham RI No. AHU-0048291.AH.01.01.TAHUN 2024 · NIB: 1910240058291 · KBLI 63122 (Aktivitas Portal Web & Platform Digital) · Terverifikasi Faktual Dewan Pers No. 849/DP-Terverifikasi/Faktual/X/2024.
                   </p>
+                  <div className="mt-2 pt-2 border-t border-blue-800/80 flex flex-col sm:flex-row sm:items-center gap-2 text-xs text-amber-300">
+                    <span className="flex items-center gap-1 font-bold">
+                      <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>Kantor Redaksi: Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia</span>
+                    </span>
+                  </div>
                 </div>
               </div>
 

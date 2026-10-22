@@ -342,11 +342,11 @@ export default function LegalitasSection({
             </div>
             <div className="flex items-center gap-2 text-blue-100">
               <Phone className="w-4 h-4 text-amber-400" />
-              <span>Hotline Redaksi: <strong>(021) 388-7200</strong></span>
+              <span>Hotline Redaksi: <strong>(021) 788-3400</strong></span>
             </div>
             <div className="flex items-center gap-2 text-blue-100">
               <MapPin className="w-4 h-4 text-amber-400" />
-              <span>Alamat Fisik: Gedung Graha Media Nusantara Lt. 4, Jl. M.H. Thamrin No. 88, Jakarta Pusat</span>
+              <span>Alamat Fisik: Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia</span>
             </div>
           </div>
         </div>

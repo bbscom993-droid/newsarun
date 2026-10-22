@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Video,
   Play,
@@ -25,8 +25,13 @@ export default function VideoNewsSection({
   onSelectArticle,
   darkMode
 }: VideoNewsSectionProps) {
-  // Filter articles that have video or isVideo flag
-  const videoArticles = articles.filter((a) => a.isVideo || !!a.videoUrl);
+  // Filter articles that have video or isVideo flag or related video tags
+  const videoArticles = articles.filter(
+    (a) =>
+      a.isVideo ||
+      Boolean(a.videoUrl) ||
+      a.tags.some((t) => t.toLowerCase().includes('video'))
+  );
 
   const [activeVideoArticle, setActiveVideoArticle] = useState<Article>(
     videoArticles[0] || articles[0]
@@ -34,6 +39,22 @@ export default function VideoNewsSection({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (videoArticles.length > 0) {
+      if (!activeVideoArticle || !videoArticles.some((v) => v.id === activeVideoArticle.id)) {
+        setActiveVideoArticle(videoArticles[0]);
+      }
+    }
+  }, [videoArticles, activeVideoArticle]);
+
+  useEffect(() => {
+    setIsPlaying(false);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, [activeVideoArticle?.id]);
 
   if (videoArticles.length === 0) return null;
 

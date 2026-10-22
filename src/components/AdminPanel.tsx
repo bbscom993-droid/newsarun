@@ -88,13 +88,16 @@ export default function AdminPanel({
   const [formVideoUrl, setFormVideoUrl] = useState('');
   const [formIsVideo, setFormIsVideo] = useState(false);
   const [videoFileName, setVideoFileName] = useState('');
+  const [videoUploadStatus, setVideoUploadStatus] = useState<string | null>(null);
+  const [isProcessingVideo, setIsProcessingVideo] = useState(false);
   const [imageFileName, setImageFileName] = useState('');
+  const [articleListFilter, setArticleListFilter] = useState<'all' | 'video'>('all');
 
   // Portal settings state & Logo upload
   const [portalName, setPortalName] = useState('ARUN NEWS');
   const [portalSlogan, setPortalSlogan] = useState('Jembatan Media Nusantara');
   const [editorialEmail, setEditorialEmail] = useState('redaksi@arunnews.id');
-  const [editorialPhone, setEditorialPhone] = useState('(021) 388-7200');
+  const [editorialPhone, setEditorialPhone] = useState('(021) 788-3400');
   const [logoFileName, setLogoFileName] = useState('');
   const [settingsSaved, setSettingsSaved] = useState(false);
 
@@ -134,6 +137,8 @@ export default function AdminPanel({
     setFormVideoUrl('');
     setFormIsVideo(false);
     setVideoFileName('');
+    setVideoUploadStatus(null);
+    setIsProcessingVideo(false);
     setImageFileName('');
     setFormIsHeadline(false);
     setFormIsBreaking(false);
@@ -153,6 +158,8 @@ export default function AdminPanel({
     setFormVideoUrl('');
     setFormIsVideo(true);
     setVideoFileName('');
+    setVideoUploadStatus(null);
+    setIsProcessingVideo(false);
     setImageFileName('');
     setFormIsHeadline(false);
     setFormIsBreaking(false);
@@ -170,24 +177,48 @@ export default function AdminPanel({
     setFormAuthorRole(art.author.role);
     setFormImageUrl(art.imageUrl);
     setFormVideoUrl(art.videoUrl || '');
-    setFormIsVideo(!!art.isVideo || !!art.videoUrl);
+    setFormIsVideo(Boolean(art.isVideo || art.videoUrl));
     setVideoFileName('');
+    setVideoUploadStatus(art.videoUrl ? 'Video berita terpasang.' : null);
+    setIsProcessingVideo(false);
     setImageFileName('');
-    setFormIsHeadline(!!art.isHeadline);
-    setFormIsBreaking(!!art.isBreaking);
+    setFormIsHeadline(Boolean(art.isHeadline));
+    setFormIsBreaking(Boolean(art.isBreaking));
     setFormTags(art.tags.join(', '));
     setIsArticleModalOpen(true);
   };
 
-  // Local Video File Upload Handler
+  // Local Video File Upload Handler (Persistent Data URL < 5MB, Blob URL preview >= 5MB)
   const handleVideoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setVideoFileName(file.name);
     setFormIsVideo(true);
-    // Create object URL or read as Data URL
-    const url = URL.createObjectURL(file);
-    setFormVideoUrl(url);
+    setIsProcessingVideo(true);
+    setVideoUploadStatus('Memproses video dari komputer lokal...');
+
+    const sizeMB = file.size / (1024 * 1024);
+
+    if (sizeMB <= 5) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setFormVideoUrl(event.target.result as string);
+          setIsProcessingVideo(false);
+          setVideoUploadStatus(`✓ Video lokal (${sizeMB.toFixed(1)} MB) berhasil diupload dan siap tayang di Warta Video!`);
+        }
+      };
+      reader.onerror = () => {
+        setIsProcessingVideo(false);
+        setVideoUploadStatus('Gagal membaca berkas video lokal.');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      const url = URL.createObjectURL(file);
+      setFormVideoUrl(url);
+      setIsProcessingVideo(false);
+      setVideoUploadStatus(`✓ Video lokal dimuat (${sizeMB.toFixed(1)} MB). Untuk tayangan publik optimal di server, disarankan berkas < 5MB.`);
+    }
   };
 
   // Local Article Image File Upload Handler
@@ -337,6 +368,17 @@ export default function AdminPanel({
       }
     } else {
       // Create new
+      const now = new Date();
+      const currentFormattedDate = `${now.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      })}, ${now.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).replace('.', ':')} WIB`;
+
       const newArt: Article = {
         id: `art-${Date.now()}`,
         title: formTitle.trim(),
@@ -353,7 +395,7 @@ export default function AdminPanel({
           role: formAuthorRole.trim() || 'Wartawan Berita',
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'
         },
-        publishedAt: '19 Okt 2026, 15:00 WIB',
+        publishedAt: currentFormattedDate,
         readTime: hasVideo ? 'Video Berita' : '3 mnt baca',
         imageUrl: formImageUrl.trim() || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&auto=format&fit=crop&q=80',
         imageCaption: 'Dokumentasi liputan jurnalis Arun News.',
@@ -645,6 +687,33 @@ export default function AdminPanel({
                 </div>
               </div>
 
+              {/* Filter Sub-Tabs */}
+              <div className="flex items-center gap-2 mb-4">
+                <button
+                  onClick={() => setArticleListFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    articleListFilter === 'all'
+                      ? 'bg-amber-400 text-slate-950 font-black'
+                      : 'bg-blue-950/80 text-blue-200 border border-blue-800 hover:text-white'
+                  }`}
+                >
+                  Semua Berita ({articles.length})
+                </button>
+                <button
+                  onClick={() => setArticleListFilter('video')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    articleListFilter === 'video'
+                      ? 'bg-rose-600 text-white font-black shadow-xs'
+                      : 'bg-blue-950/80 text-rose-300 border border-rose-900/60 hover:bg-rose-950/50'
+                  }`}
+                >
+                  <Video className="w-3.5 h-3.5" />
+                  <span>
+                    Warta Video ({articles.filter((a) => a.isVideo || Boolean(a.videoUrl)).length})
+                  </span>
+                </button>
+              </div>
+
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs text-white">
                   <thead>
@@ -657,11 +726,23 @@ export default function AdminPanel({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-blue-800/60">
-                    {articles.map((art) => (
+                    {articles
+                      .filter((a) =>
+                        articleListFilter === 'video'
+                          ? a.isVideo || Boolean(a.videoUrl) || a.tags.some((t) => t.toLowerCase().includes('video'))
+                          : true
+                      )
+                      .map((art) => (
                       <tr key={art.id} className="hover:bg-blue-900/40 transition-colors">
                         <td className="py-3 pr-4">
-                          <div className="font-bold text-white line-clamp-1">
-                            {art.title}
+                          <div className="font-bold text-white line-clamp-1 flex items-center gap-1.5">
+                            {(art.isVideo || Boolean(art.videoUrl)) && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-rose-600 text-white text-[9px] font-black shrink-0">
+                                <Video className="w-2.5 h-2.5 fill-white" />
+                                <span>VIDEO</span>
+                              </span>
+                            )}
+                            <span className="truncate">{art.title}</span>
                           </div>
                           <div className="text-[10px] text-blue-300 mt-0.5">
                             {art.publishedAt} · {art.readTime}

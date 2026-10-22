@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Clock, ArrowRight } from 'lucide-react';
 import { Article } from '../data/newsData';
+import { CATEGORIES } from './Header';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ export default function SearchModal({
 
   if (!isOpen) return null;
 
-  const categories = ['Semua', 'Politik', 'Daerah', 'Kriminal', 'Lain-lain', 'Olahraga', 'Legalitas', 'Lapor Warga'];
+  const categories = CATEGORIES;
 
   const filtered = articles.filter((art) => {
     const matchesCategory = selectedFilter === 'Semua' || art.category === selectedFilter;
@@ -64,7 +65,7 @@ export default function SearchModal({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari isu politik, daerah, kriminal, olahraga, legalitas..."
+            placeholder="Cari isu politik, ekonomi, daerah, kriminal, olahraga, legalitas..."
             className="flex-1 text-sm sm:text-base font-medium bg-transparent focus-visible:outline-none placeholder-blue-300/50 text-white"
           />
           {query && (

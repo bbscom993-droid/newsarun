@@ -90,8 +90,8 @@ export const DEFAULT_PORTAL_CONFIG: PortalBrandConfig = {
   portalName: 'ARUN NEWS',
   portalSlogan: 'Jembatan Media Nusantara',
   editorialEmail: 'redaksi@arunnews.id',
-  editorialPhone: '(021) 388-7200',
-  address: 'Gedung Graha Media Nusantara Lt. 4, Jl. M.H. Thamrin No. 88, Jakarta Pusat 10350'
+  editorialPhone: '(021) 788-3400',
+  address: 'Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia'
 };
 
 export const ARUN_LEGAL_DATA = {
@@ -108,7 +108,7 @@ export const ARUN_LEGAL_DATA = {
   pemimpinRedaksi: 'Dr. H. Bagus Setyawan, M.I.Kom',
   redakturEksekutif: 'Rian Hidayat, M.Si',
   kuasaHukum: 'Adv. Hendra Wijaya, S.H., M.H. & Partners (Advokat & Konsultan Hukum Media Siber)',
-  alamatKantor: 'Gedung Graha Media Nusantara Lt. 4, Jl. M.H. Thamrin No. 88, Jakarta Pusat 10350',
+  alamatKantor: 'Gg Gaya, Pasar minggu, kec, Pasar minggu, Jakarta Selatan, DKI JAKARTA, Indonesia',
   notaris: 'Dra. Hj. Nurjanah Sasmita, S.H., M.Kn (Akta No. 24 Tanggal 15 Januari 2024)',
   merekDaftarHki: 'Kemenkumham Ditjen HKI Sertifikat Merek Kelas 38 & 41 No. IDM000984123',
   pedomanMediaSiber: 'Kepatuhan penuh pada Standar Peraturan Dewan Pers No. 1/Peraturan-DP/III/2012'
@@ -472,7 +472,7 @@ export const INITIAL_ARTICLES: Article[] = [
     category: 'Legalitas',
     summary: 'Saksikan liputan dokumentasi verifikasi faktual tim Dewan Pers RI di kantor redaksi PT Arun Media Nusantara, menetapkan legalitas jurnalistik dan perlindungan wartawan.',
     content: [
-      'Dewan Pers Republik Indonesia melakukan verifikasi faktual secara langsung ke kantor redaksi PT Arun Media Nusantara di Jakarta Pusat.',
+      'Dewan Pers Republik Indonesia melakukan verifikasi faktual secara langsung ke kantor redaksi PT Arun Media Nusantara di Gg Gaya, Pasar Minggu, Jakarta Selatan.',
       'Dalam kunjungan visitasi ini, tim penilai Dewan Pers memeriksa keabsahan akta pendirian berbadan hukum pers (PT), sertifikat kompetensi wartawan utama pemimpin redaksi, sistem penggajian standar upah layak, serta kepatuhan ruang redaksi terhadap Kode Etik Jurnalistik.',
       'Ketua Komisi Hukum dan Perundang-undangan Dewan Pers menyampaikan bahwa Arun News telah memenuhi seluruh 17 pasal standar perusahaan pers dan resmi memperoleh sertifikat verifikasi faktual.',
       '"Kami mengapresiasi Arun News yang secara konsisten menjaga marwah pers yang independen, menolak penyebaran hoaks, dan mengedepankan hak publik atas kebenaran," ujarnya dalam sesi wawancara video resmi.'

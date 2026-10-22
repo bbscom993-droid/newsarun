@@ -106,3 +106,7 @@
     width: 100%;
   }
 }
+
+.animate-ticker-5s {
+  animation: tickerProgress 5s linear infinite;
+}

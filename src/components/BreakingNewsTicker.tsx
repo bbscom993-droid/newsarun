@@ -59,7 +59,7 @@ export default function BreakingNewsTicker({
         <div
           key={progressKey}
           className={`h-full bg-gradient-to-r from-amber-500 via-amber-300 to-amber-500 origin-left ${
-            isPaused ? 'opacity-40' : 'animate-[tickerProgress_5s_linear_infinite]'
+            isPaused ? 'opacity-40' : 'animate-ticker-5s'
           }`}
           style={{
             animationDuration: `${ROTATION_INTERVAL_MS}ms`,
@@ -70,13 +70,13 @@ export default function BreakingNewsTicker({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-10 gap-2.5 sm:gap-3">
-          {/* Badge: RUNNING HEADLINE / 5 DETIK BERJALAN */}
+          {/* Badge: RUNNING TEKS HEADLINE / 5 DETIK BERJALAN */}
           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-[10px] sm:text-[11px] tracking-wider uppercase rounded-md shrink-0 shadow-md">
             <Zap className="w-3.5 h-3.5 fill-slate-950 animate-pulse" />
-            <span className="font-extrabold">RUNNING HEADLINE</span>
+            <span className="font-extrabold">RUNNING TEKS HEADLINE</span>
             <span className="hidden md:inline-flex items-center gap-0.5 text-[9px] bg-slate-950/90 text-amber-300 px-1.5 py-0.2 rounded font-black ml-0.5">
               <Clock className="w-2.5 h-2.5" />
-              <span>5s</span>
+              <span>5 Detik</span>
             </span>
           </div>
 

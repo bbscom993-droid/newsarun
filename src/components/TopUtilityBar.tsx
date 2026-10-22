@@ -11,7 +11,12 @@ export default function TopUtilityBar({ darkMode }: TopUtilityBarProps) {
   const [showCityMenu, setShowCityMenu] = useState(false);
 
   // Today's date in formal Indonesian
-  const formattedDate = 'Senin, 19 Oktober 2026';
+  const formattedDate = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
   const hijriDate = '8 Rabiul Akhir 1448 H';
 
   const renderWeatherIcon = (icon: WeatherCity['icon']) => {
