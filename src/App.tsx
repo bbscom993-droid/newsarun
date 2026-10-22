@@ -40,7 +40,15 @@ import {
   CoffeeTip,
   CommentItem,
   LaporWargaConfig,
-  DEFAULT_LAPOR_WARGA_CONFIG
+  DEFAULT_LAPOR_WARGA_CONFIG,
+  CategoryItem,
+  PortalThemeConfig,
+  AntiBuzzerConfig,
+  BuzzerInterceptionLog,
+  DEFAULT_CATEGORIES,
+  DEFAULT_THEME_CONFIG,
+  DEFAULT_ANTI_BUZZER_CONFIG,
+  INITIAL_BUZZER_LOGS
 } from './data/newsData';
 
 export default function App() {
@@ -162,7 +170,75 @@ export default function App() {
     return DEFAULT_LAPOR_WARGA_CONFIG;
   });
 
+  // Categories State with LocalStorage Persistence
+  const [categories, setCategories] = useState<CategoryItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('arun_news_categories');
+        if (saved) return JSON.parse(saved);
+      } catch {
+        return DEFAULT_CATEGORIES;
+      }
+    }
+    return DEFAULT_CATEGORIES;
+  });
+
+  // Portal Theme & Design Template State
+  const [themeConfig, setThemeConfig] = useState<PortalThemeConfig>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('arun_news_theme_config');
+        if (saved) return JSON.parse(saved);
+      } catch {
+        return DEFAULT_THEME_CONFIG;
+      }
+    }
+    return DEFAULT_THEME_CONFIG;
+  });
+
+  // Anti-Buzzer Shield State
+  const [antiBuzzerConfig, setAntiBuzzerConfig] = useState<AntiBuzzerConfig>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('arun_news_antibuzzer_config');
+        if (saved) return JSON.parse(saved);
+      } catch {
+        return DEFAULT_ANTI_BUZZER_CONFIG;
+      }
+    }
+    return DEFAULT_ANTI_BUZZER_CONFIG;
+  });
+
+  // Buzzer Interception Logs State
+  const [buzzerLogs, setBuzzerLogs] = useState<BuzzerInterceptionLog[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('arun_news_buzzer_logs');
+        if (saved) return JSON.parse(saved);
+      } catch {
+        return INITIAL_BUZZER_LOGS;
+      }
+    }
+    return INITIAL_BUZZER_LOGS;
+  });
+
   // Sync to local storage
+  useEffect(() => {
+    localStorage.setItem('arun_news_categories', JSON.stringify(categories));
+  }, [categories]);
+
+  useEffect(() => {
+    localStorage.setItem('arun_news_theme_config', JSON.stringify(themeConfig));
+  }, [themeConfig]);
+
+  useEffect(() => {
+    localStorage.setItem('arun_news_antibuzzer_config', JSON.stringify(antiBuzzerConfig));
+  }, [antiBuzzerConfig]);
+
+  useEffect(() => {
+    localStorage.setItem('arun_news_buzzer_logs', JSON.stringify(buzzerLogs));
+  }, [buzzerLogs]);
+
   useEffect(() => {
     localStorage.setItem('arun_articles', JSON.stringify(articles));
   }, [articles]);
@@ -460,6 +536,40 @@ export default function App() {
     return matchesCat && matchesTag;
   });
 
+  // Category, Theme & Anti-Buzzer Handlers
+  const handleAddCategory = (newCat: CategoryItem) => {
+    setCategories((prev) => [...prev, newCat]);
+    showToast(`Kategori "${newCat.name}" berhasil ditambahkan ke portal!`);
+  };
+
+  const handleDeleteCategory = (catId: string) => {
+    setCategories((prev) => prev.filter((c) => c.id !== catId));
+    showToast('Kategori berhasil dihapus.');
+  };
+
+  const handleUpdateThemeConfig = (updated: PortalThemeConfig) => {
+    setThemeConfig(updated);
+    showToast('Pengaturan desain & warna portal berhasil disimpan!');
+  };
+
+  const handleUpdateAntiBuzzerConfig = (updated: AntiBuzzerConfig) => {
+    setAntiBuzzerConfig(updated);
+    showToast('Konfigurasi Perisai Anti-Buzzer berhasil diperbarui!');
+  };
+
+  const handleClearBuzzerLogs = () => {
+    setBuzzerLogs([]);
+    showToast('Riwayat log intersepsi buzzer berhasil dibersihkan.');
+  };
+
+  const handleLogBuzzerInterception = (log: BuzzerInterceptionLog) => {
+    setBuzzerLogs((prev) => [log, ...prev]);
+    setAntiBuzzerConfig((prev) => ({
+      ...prev,
+      interceptedCount: prev.interceptedCount + 1
+    }));
+  };
+
   const leadArticle = articles.find((a) => a.isHeadline) || articles[0];
   const secondaryArticles = articles.filter((a) => a.id !== leadArticle.id && a.isEditorPick).slice(0, 2);
   const headerAdSlot = adSlots.find((s) => s.position === 'header_leaderboard');
@@ -503,16 +613,46 @@ export default function App() {
           setToastMessage('Pengaturan Lapor Warga berhasil disimpan!');
           setTimeout(() => setToastMessage(null), 3000);
         }}
+        categories={categories}
+        onAddCategory={handleAddCategory}
+        onDeleteCategory={handleDeleteCategory}
+        themeConfig={themeConfig}
+        onUpdateThemeConfig={handleUpdateThemeConfig}
+        antiBuzzerConfig={antiBuzzerConfig}
+        onUpdateAntiBuzzerConfig={handleUpdateAntiBuzzerConfig}
+        buzzerLogs={buzzerLogs}
+        onClearBuzzerLogs={handleClearBuzzerLogs}
       />
     );
   }
+
+  // Theme and layout dynamic classes
+  const getThemeBgClass = () => {
+    switch (themeConfig.presetTheme) {
+      case 'emerald_garuda':
+        return darkMode ? 'bg-[#041a15]' : 'bg-[#062820]';
+      case 'maroon_merdeka':
+        return darkMode ? 'bg-[#1c050c]' : 'bg-[#2a0812]';
+      case 'deep_sapphire':
+        return darkMode ? 'bg-[#030c1a]' : 'bg-[#051329]';
+      case 'classic_press':
+        return darkMode ? 'bg-[#0b0f17]' : 'bg-[#111827]';
+      case 'nusantara_navy':
+      default:
+        return darkMode ? 'bg-[#07162b]' : 'bg-[#0c2447]';
+    }
+  };
 
   // PORTAL VIEW MODE
   return (
     <div
       className={`min-h-screen flex flex-col transition-colors duration-200 ${
-        darkMode ? 'bg-[#07162b] text-slate-100' : 'bg-[#0c2447] text-slate-100'
-      }`}
+        themeConfig.primaryFont === 'serif' ? 'font-serif' : 'font-sans'
+      } ${getThemeBgClass()} text-slate-100`}
+      style={{
+        // Expose dynamic accent color as CSS custom property
+        ['--portal-accent' as any]: themeConfig.accentColor
+      }}
     >
       {/* 1. Market Data & Date Bar */}
       <TopUtilityBar darkMode={darkMode} />
@@ -531,6 +671,7 @@ export default function App() {
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
         customLogoUrl={customLogoUrl}
+        categoriesList={categories.map((c) => c.name)}
       />
 
       {/* 3. Running Teks Headline */}
@@ -632,14 +773,17 @@ export default function App() {
                 </div>
 
                 <p className="text-xs sm:text-sm text-blue-200 mt-2 max-w-2xl leading-relaxed">
-                  {activeCategory === 'Politik' && 'Liputan komprehensif, independen dan tepercaya mengenai dinamika parlemen, kebijakan pemerintah, dan peta politik Nusantara.'}
-                  {activeCategory === 'Daerah' && 'Kabar dan perkembangan langsung dari pelosok Nusantara, pembangunan infrastruktur, budaya lokal, dan denyut nadi daerah.'}
-                  {activeCategory === 'Kriminal' && 'Laporan penegakan hukum, pemberantasan kejahatan, dan investigasi kasus hukum dengan akurasi dan etika jurnalistik teruji.'}
-                  {activeCategory === 'Olahraga' && 'Ulasan pertandingan, prestasi atlet kebanggaan Garuda, dan dinamika kompetisi olahraga nasional hingga internasional.'}
-                  {activeCategory === 'Legalitas' && 'Profil dan keabsahan hukum resmi PT Arun Media Nusantara: SK Kemenkumham RI, NIB KBLI 63122, NPWP Perusahaan Pers, serta Sertifikasi Verifikasi Faktual Dewan Pers.'}
-                  {activeCategory === 'Ekonomi' && 'Analisis komprehensif pasar modal, pergerakan IHSG, industri perbankan nasional, pembiayaan digital UMKM, investasi manufaktur hijau, dan denyut nadi perekonomian Nusantara.'}
-                  {activeCategory === 'Lapor Warga' && 'Ruang suara dan advokasi jurnalisme warga. Laporkan kerusakan fasilitas publik, keluhan layanan, atau peristiwa di sekitar Anda.'}
-                  {activeCategory === 'Lain-lain' && 'Ragam informasi gaya hidup, teknologi, fenomena terkini, dan serba-serbi Nusantara terhangat.'}
+                  {categories.find((c) => c.name === activeCategory)?.description || (
+                    activeCategory === 'Politik' ? 'Liputan komprehensif, independen dan tepercaya mengenai dinamika parlemen, kebijakan pemerintah, dan peta politik Nusantara.' :
+                    activeCategory === 'Daerah' ? 'Kabar dan perkembangan langsung dari pelosok Nusantara, pembangunan infrastruktur, budaya lokal, dan denyut nadi daerah.' :
+                    activeCategory === 'Kriminal' ? 'Laporan penegakan hukum, pemberantasan kejahatan, dan investigasi kasus hukum dengan akurasi dan etika jurnalistik teruji.' :
+                    activeCategory === 'Olahraga' ? 'Ulasan pertandingan, prestasi atlet kebanggaan Garuda, dan dinamika kompetisi olahraga nasional hingga internasional.' :
+                    activeCategory === 'Legalitas' ? 'Profil dan keabsahan hukum resmi PT Arun Media Nusantara: SK Kemenkumham RI, NIB KBLI 63122, NPWP Perusahaan Pers, serta Sertifikasi Verifikasi Faktual Dewan Pers.' :
+                    activeCategory === 'Ekonomi' ? 'Analisis komprehensif pasar modal, pergerakan IHSG, industri perbankan nasional, pembiayaan digital UMKM, investasi manufaktur hijau, dan denyut nadi perekonomian Nusantara.' :
+                    activeCategory === 'Lapor Warga' ? 'Ruang suara dan advokasi jurnalisme warga. Laporkan kerusakan fasilitas publik, keluhan layanan, atau peristiwa di sekitar Anda.' :
+                    activeCategory === 'Lain-lain' ? 'Ragam informasi gaya hidup, teknologi, fenomena terkini, dan serba-serbi Nusantara terhangat.' :
+                    `Kumpulan berita terkini, investigasi mendalam, dan laporan faktual seputar ${activeCategory} dari seluruh pelosok Nusantara.`
+                  )}
                 </p>
               </div>
 
@@ -769,6 +913,8 @@ export default function App() {
           onAddComment={handleAddComment}
           onOpenSawerKopi={handleOpenSawerKopi}
           darkMode={darkMode}
+          antiBuzzerConfig={antiBuzzerConfig}
+          onLogBuzzer={handleLogBuzzerInterception}
         />
       )}
 

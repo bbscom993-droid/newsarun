@@ -17,9 +17,11 @@ import {
   MessageSquare,
   Coffee,
   Video,
-  Play
+  Play,
+  ShieldCheck,
+  ShieldAlert
 } from 'lucide-react';
-import { Article, CommentItem } from '../data/newsData';
+import { Article, CommentItem, AntiBuzzerConfig, BuzzerInterceptionLog } from '../data/newsData';
 import WhatsAppShareModal from './WhatsAppShareModal';
 
 interface ArticleModalProps {
@@ -32,6 +34,8 @@ interface ArticleModalProps {
   onAddComment: (articleId: string, comment: CommentItem) => void;
   onOpenSawerKopi: (articleTitle?: string) => void;
   darkMode: boolean;
+  antiBuzzerConfig?: AntiBuzzerConfig;
+  onLogBuzzer?: (log: BuzzerInterceptionLog) => void;
 }
 
 export default function ArticleModal({
@@ -43,7 +47,9 @@ export default function ArticleModal({
   isBookmarked,
   onAddComment,
   onOpenSawerKopi,
-  darkMode
+  darkMode,
+  antiBuzzerConfig,
+  onLogBuzzer
 }: ArticleModalProps) {
   const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg'>('base');
   const [copiedLink, setCopiedLink] = useState(false);
@@ -123,21 +129,75 @@ export default function ArticleModal({
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentName.trim() || !commentText.trim()) return;
+    const trimmedName = commentName.trim();
+    const trimmedText = commentText.trim();
+    if (!trimmedName || !trimmedText) return;
+
+    // Check Anti-Buzzer Shield if active
+    if (antiBuzzerConfig && antiBuzzerConfig.isEnabled) {
+      const lowerText = trimmedText.toLowerCase();
+
+      // 1. Check for blacklisted keywords
+      const matchedKeyword = antiBuzzerConfig.blockedKeywords.find((kw) =>
+        lowerText.includes(kw.toLowerCase())
+      );
+
+      if (matchedKeyword) {
+        setActionToast(
+          `🛡️ Perisai Anti-Buzzer: Komentar dicegat karena memuat kata kunci terlarang/provokatif ("${matchedKeyword}"). Mohon gunakan bahasa santun.`
+        );
+        if (onLogBuzzer) {
+          onLogBuzzer({
+            id: `log-${Date.now()}`,
+            timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
+            authorName: trimmedName,
+            snippet: trimmedText.slice(0, 75) + '...',
+            reason: `Kata Kunci Terlarang: ${matchedKeyword}`,
+            status: 'blocked',
+            articleTitle: article.title
+          });
+        }
+        setTimeout(() => setActionToast(null), 5000);
+        return;
+      }
+
+      // 2. Check for prohibited external links/spam
+      if (antiBuzzerConfig.blockLinksInComments) {
+        const hasLink = /(https?:\/\/|www\.|\.com|\.net|\.xyz|\.link|bit\.ly)/i.test(trimmedText);
+        if (hasLink) {
+          setActionToast(
+            '🛡️ Perisai Anti-Buzzer: Tautan eksternal dinonaktifkan di kolom komentar demi mencegah spam bot dan judi online.'
+          );
+          if (onLogBuzzer) {
+            onLogBuzzer({
+              id: `log-${Date.now()}`,
+              timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
+              authorName: trimmedName,
+              snippet: trimmedText.slice(0, 75) + '...',
+              reason: 'Tautan / Link Spam Dilarang',
+              status: 'blocked',
+              articleTitle: article.title
+            });
+          }
+          setTimeout(() => setActionToast(null), 5000);
+          return;
+        }
+      }
+    }
 
     const newComment: CommentItem = {
       id: `comm-${Date.now()}`,
-      author: commentName.trim(),
+      author: trimmedName,
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
       timeAgo: 'Baru saja',
-      content: commentText.trim(),
+      content: trimmedText,
       likes: 0
     };
 
     onAddComment(article.id, newComment);
     setCommentName('');
     setCommentText('');
-    setActionToast('Komentar Anda berhasil dikirim ke ruang tanggapan pembaca!');
+    setActionToast('✓ Komentar Anda lolos moderasi Perisai Anti-Buzzer dan berhasil diterbitkan!');
     setTimeout(() => setActionToast(null), 3500);
   };
 
@@ -535,6 +595,21 @@ export default function ArticleModal({
                 Moderasi Aktif
               </span>
             </div>
+
+            {/* Anti-Buzzer Shield Protection Banner */}
+            {antiBuzzerConfig && antiBuzzerConfig.isEnabled && (
+              <div className="mb-4 p-3 rounded-xl bg-emerald-950/70 border border-emerald-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-300 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="font-semibold">
+                    Ruang Diskusi Dilindungi Perisai Anti-Buzzer Arun News
+                  </span>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500 text-slate-950 self-start sm:self-auto">
+                  Filter Bot Aktif
+                </span>
+              </div>
+            )}
 
             <form onSubmit={handleSubmitComment} className="mb-6 space-y-3">
               <input
