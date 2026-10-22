@@ -15,6 +15,10 @@ import EditorialPicksSection from './components/EditorialPicksSection';
 import VideoNewsSection from './components/VideoNewsSection';
 import NewsStreamSection from './components/NewsStreamSection';
 import MultimediaGallery from './components/MultimediaGallery';
+import PopularAndTrendingSection from './components/PopularAndTrendingSection';
+import BrowserNotificationManager from './components/BrowserNotificationManager';
+import OpiniEsaiSection from './components/OpiniEsaiSection';
+import DailyNewsletterSection from './components/DailyNewsletterSection';
 import ArticleModal from './components/ArticleModal';
 import SavedArticlesDrawer from './components/SavedArticlesDrawer';
 import SearchModal from './components/SearchModal';
@@ -699,6 +703,15 @@ export default function App() {
         darkMode={darkMode}
       />
 
+      {/* Real-time Browser Push Alert Manager */}
+      <BrowserNotificationManager
+        darkMode={darkMode}
+        onSendTestToast={(msg) => {
+          setToastMessage(msg);
+          setTimeout(() => setToastMessage(null), 3500);
+        }}
+      />
+
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-blue-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-amber-400 text-xs font-bold flex items-center gap-2 animate-in slide-in-from-bottom duration-200">
@@ -725,6 +738,13 @@ export default function App() {
 
             {/* Prakiraan Cuaca & Jadwal Transportasi Nusantara */}
             <PublicServicesWidget darkMode={darkMode} />
+
+            {/* Terpopuler & Paling Banyak Dibahas (Peringkat 24 Jam Terakhir) */}
+            <PopularAndTrendingSection
+              articles={articles}
+              onSelectArticle={(art) => setSelectedArticle(art)}
+              darkMode={darkMode}
+            />
 
             {/* Berita Pilihan Redaksi */}
             <EditorialPicksSection
@@ -851,6 +871,12 @@ export default function App() {
               darkMode={darkMode}
             />
 
+            {/* Kolom Opini & Esai Nusantara */}
+            <OpiniEsaiSection
+              onSelectArticle={(art) => setSelectedArticle(art)}
+              darkMode={darkMode}
+            />
+
             {/* 6. Photojournalism Gallery */}
             <MultimediaGallery
               articles={articles}
@@ -859,6 +885,9 @@ export default function App() {
             />
           </>
         )}
+
+        {/* Langganan Newsletter Harian Arun News */}
+        <DailyNewsletterSection darkMode={darkMode} />
       </main>
 
       {/* 7. Footer with 3D Brand & Custom Logo */}

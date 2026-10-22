@@ -9,8 +9,11 @@ import {
   Sparkles,
   Eye,
   Clock,
-  ChevronRight,
-  Share2
+  Radio,
+  Share2,
+  Tv,
+  CheckCircle2,
+  Users
 } from 'lucide-react';
 import { Article } from '../data/newsData';
 
@@ -33,6 +36,8 @@ export default function VideoNewsSection({
   );
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [isLiveStreamingActive, setIsLiveStreamingActive] = useState(true);
+  const [liveViewers, setLiveViewers] = useState(2480);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   if (videoArticles.length === 0) return null;
@@ -71,37 +76,52 @@ export default function VideoNewsSection({
   return (
     <section id="warta-video-section" className="mb-10 w-full scroll-mt-20">
       <div
-        className={`p-5 sm:p-6 rounded-2xl border transition-colors shadow-xl ${
+        className={`p-5 sm:p-7 rounded-2xl border transition-colors shadow-xl ${
           darkMode
             ? 'bg-gradient-to-br from-[#06182e] via-[#092244] to-[#06182e] border-blue-900/80 text-white'
             : 'bg-gradient-to-br from-[#081e3a] via-[#0d2a50] to-[#081e3a] border-blue-800 text-white shadow-2xl'
         }`}
       >
-        {/* Section Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-blue-800/80 mb-6">
+        {/* Section Header with Live Stream Indicator */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-blue-800/80 gap-3 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-amber-400 text-white flex items-center justify-center font-black shadow-md">
-              <Video className="w-5 h-5 fill-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-amber-400 text-white flex items-center justify-center font-black shadow-lg shadow-rose-500/20">
+              <Tv className="w-5 h-5 fill-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black tracking-wider uppercase bg-rose-600 text-white px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                  <span>Warta Video</span>
+                <span className="text-[10px] font-black tracking-wider uppercase bg-rose-600 text-white px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1.5 animate-pulse">
+                  <span className="w-2 h-2 rounded-full bg-white" />
+                  <span>SIARAN LANGSUNG STREAMING BERITA AKTIF</span>
                 </span>
-                <span className="text-[11px] text-blue-200 font-semibold hidden sm:inline">
-                  Liputan Visual Eksklusif & Siaran Berita
+                <span className="text-[11px] text-blue-200 font-semibold hidden md:inline">
+                  Liputan Visual Eksklusif 24 Jam
                 </span>
               </div>
-              <h2 className="text-lg sm:text-xl font-black text-white tracking-tight mt-0.5 uppercase">
+              <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight mt-1 uppercase">
                 Warta Video & Liputan Khusus
               </h2>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{videoArticles.length} Video Berita</span>
+          <div className="flex items-center gap-3 text-xs">
+            {/* Live Viewers counter */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-950/80 border border-blue-700/80 text-amber-300 font-bold">
+              <Users className="w-3.5 h-3.5 text-amber-400" />
+              <span>{liveViewers.toLocaleString('id-ID')} Pemirsa Langsung</span>
+            </div>
+
+            <button
+              onClick={() => setIsLiveStreamingActive(!isLiveStreamingActive)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                isLiveStreamingActive
+                  ? 'bg-rose-600 text-white shadow-md'
+                  : 'bg-blue-900/70 text-blue-200 hover:text-white'
+              }`}
+            >
+              <Radio className="w-3.5 h-3.5" />
+              <span>{isLiveStreamingActive ? 'Streaming Aktif' : 'VOD Mode'}</span>
+            </button>
           </div>
         </div>
 
@@ -109,7 +129,7 @@ export default function VideoNewsSection({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Main Video Player (8 cols) */}
           <div className="lg:col-span-8 space-y-3">
-            <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-black border-2 border-amber-400/60 shadow-2xl group">
+            <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-black border-2 border-amber-400/80 shadow-2xl group">
               {currentVideo.videoUrl ? (
                 <video
                   ref={videoRef}
@@ -117,6 +137,7 @@ export default function VideoNewsSection({
                   poster={currentVideo.imageUrl}
                   className="w-full h-full object-contain bg-black"
                   controls={false}
+                  autoPlay={false}
                   onEnded={() => setIsPlaying(false)}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
@@ -134,19 +155,30 @@ export default function VideoNewsSection({
                 </div>
               )}
 
+              {/* Streaming Overlay Badge */}
+              <div className="absolute top-3 left-3 flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-md bg-rose-600/90 text-white text-[11px] font-black uppercase tracking-wider backdrop-blur-xs flex items-center gap-1.5 shadow-md">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  <span>STREAMING AKTIF</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-black/70 text-amber-300 text-[10px] font-bold backdrop-blur-xs">
+                  ARUN NEWS TV HD
+                </span>
+              </div>
+
               {/* Center Big Play Button when paused */}
               {!isPlaying && currentVideo.videoUrl && (
                 <button
                   onClick={handleTogglePlay}
-                  className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-amber-400/90 text-slate-950 flex items-center justify-center hover:scale-110 transition-transform shadow-2xl backdrop-blur-xs focus:outline-none"
-                  aria-label="Putar video berita"
+                  className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-amber-400/95 text-slate-950 flex items-center justify-center hover:scale-110 transition-transform shadow-2xl backdrop-blur-xs focus:outline-none"
+                  aria-label="Putar streaming warta video"
                 >
-                  <Play className="w-7 h-7 fill-slate-950 ml-1" />
+                  <Play className="w-8 h-8 fill-slate-950 ml-1" />
                 </button>
               )}
 
               {/* Bottom Custom Video Controls Bar */}
-              <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex items-center justify-between gap-3 text-white">
+              <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/95 via-black/70 to-transparent flex items-center justify-between gap-3 text-white">
                 <div className="flex items-center gap-2.5">
                   <button
                     onClick={handleTogglePlay}
@@ -172,9 +204,9 @@ export default function VideoNewsSection({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onSelectArticle(currentVideo)}
-                    className="px-2.5 py-1 rounded-md bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition-colors"
+                    className="px-3 py-1 rounded-md bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition-colors shadow-xs"
                   >
-                    Baca Berita Lengkap
+                    Baca Naskah Lengkap
                   </button>
 
                   <button
@@ -189,7 +221,7 @@ export default function VideoNewsSection({
             </div>
 
             {/* Video Info under player */}
-            <div className="p-4 rounded-xl bg-blue-950/70 border border-blue-800">
+            <div className="p-4 rounded-xl bg-blue-950/80 border border-blue-800">
               <div className="flex items-center gap-2 mb-1.5 text-xs text-blue-300">
                 <span className="px-2 py-0.5 rounded bg-blue-900 text-amber-300 font-extrabold text-[10px] uppercase border border-amber-400/30">
                   {currentVideo.category}
@@ -218,10 +250,11 @@ export default function VideoNewsSection({
           {/* Video Playlist Cards (4 cols) */}
           <div className="lg:col-span-4 space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-blue-800 text-xs">
-              <span className="font-black uppercase tracking-wider text-amber-400">
-                Daftar Tayangan Video
+              <span className="font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <Video className="w-3.5 h-3.5 text-amber-400" />
+                <span>Koleksi Video & Liputan</span>
               </span>
-              <span className="text-[11px] text-blue-300">Klik untuk putar</span>
+              <span className="text-[11px] text-blue-300">Pilih untuk streaming</span>
             </div>
 
             <div className="space-y-2.5 max-h-[500px] overflow-y-auto no-scrollbar pr-1">

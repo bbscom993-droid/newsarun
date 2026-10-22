@@ -3,6 +3,8 @@ import { Clock, Eye, MessageSquare, Share2, Bookmark, Vote, Megaphone, Coffee, V
 import { Article, AdSlot } from '../data/newsData';
 import AdSlotBanner from './AdSlotBanner';
 import SocialFeedWidget from './SocialFeedWidget';
+import SidebarAd300x250 from './SidebarAd300x250';
+import PublicPollingWidget from './PublicPollingWidget';
 
 interface NewsStreamSectionProps {
   articles: Article[];
@@ -313,14 +315,12 @@ export default function NewsStreamSection({
 
       {/* RIGHT COLUMN: Sidebar (4 cols) */}
       <aside className="lg:col-span-4 space-y-6">
-        {/* Dedicated Sidebar Ad Slot Banner */}
-        {sidebarSlot && (
-          <AdSlotBanner
-            slot={sidebarSlot}
-            onSubscribe={onSubscribeAdSlot}
-            darkMode={darkMode}
-          />
-        )}
+        {/* Dedicated Sidebar Ad Slot (300 x 250 px MREC) */}
+        <SidebarAd300x250
+          slot={sidebarSlot}
+          onSubscribeAdSlot={onSubscribeAdSlot}
+          darkMode={darkMode}
+        />
 
         {/* Widget 1: TERPOPULER (Top 5 Ranked) */}
         <div
@@ -368,66 +368,8 @@ export default function NewsStreamSection({
         {/* Widget: SOCIAL MEDIA FEED (Official Arun News Handles) */}
         <SocialFeedWidget darkMode={darkMode} />
 
-        {/* Widget 2: POLLING PEMBACA */}
-        <div
-          className={`p-5 rounded-2xl border ${
-            darkMode ? 'bg-[#081930] border-blue-900/80 text-white' : 'bg-[#0e2a52] text-white border-blue-700/60 shadow-xl'
-          }`}
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <Vote className="w-4 h-4 text-amber-400" />
-            <span className="text-[11px] uppercase font-black tracking-wider text-amber-400">
-              POLLING PEMBACA ARUN
-            </span>
-          </div>
-          <h4 className="text-xs sm:text-sm font-black leading-snug mb-3">
-            Bagaimana penilaian Anda terhadap penegakan hukum dan pemberantasan sindikat judi online saat ini?
-          </h4>
-
-          <div className="space-y-2">
-            {[
-              { id: 1, label: 'Sangat Puas & Harus Diperluas' },
-              { id: 2, label: 'Perlu Pengawasan Lebih Rutin' },
-              { id: 3, label: 'Fokuskan ke Pemblokiran Rekening' }
-            ].map((opt) => {
-              const votes = pollVotes[opt.id] || 0;
-              const percent = Math.round((votes / totalPollVotes) * 100);
-              const isSelected = pollVoted === opt.id;
-
-              return (
-                <button
-                  key={opt.id}
-                  onClick={() => handleVote(opt.id)}
-                  disabled={pollVoted !== null}
-                  className={`w-full text-left p-2.5 rounded-xl text-xs transition-all relative overflow-hidden border ${
-                    isSelected
-                      ? 'border-amber-400 bg-amber-400/20 text-white font-black'
-                      : 'border-blue-700/60 hover:border-amber-400/60 bg-blue-950/70 text-blue-100'
-                  }`}
-                >
-                  {pollVoted !== null && (
-                    <div
-                      className="absolute inset-y-0 left-0 bg-blue-600/40 -z-0 transition-all duration-700"
-                      style={{ width: `${percent}%` }}
-                    />
-                  )}
-                  <div className="relative z-10 flex items-center justify-between">
-                    <span>{opt.label}</span>
-                    {pollVoted !== null && (
-                      <span className="font-bold tabular-nums text-amber-300 ml-2">
-                        {percent}%
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-3 text-[10px] text-slate-300 text-right tabular-nums">
-            Total {totalPollVotes.toLocaleString('id-ID')} Partisipan Warga
-          </div>
-        </div>
+        {/* Widget 2: JAJAK PENDAPAT PUBLIK (Suara Pembaca Arun News) */}
+        <PublicPollingWidget darkMode={darkMode} />
 
         {/* Widget 3: SAWER KOPI PROMO CARD */}
         <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 text-slate-950 shadow-md">
